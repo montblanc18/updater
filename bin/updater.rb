@@ -129,7 +129,6 @@ if __FILE__ == $0
       opts[:port_clean] = true }
     o.on("-i", "--inactivate", "Perform macports uninstall inactive."){|x|
       opts[:port_inactive] = true
-      puts "本当にsudo port -v uninstall inactiveを実行しますか[Yes/no]?"
       print("Do You want to perform \"sudo port -v uninstall inactive\"? [YES/no]:")
       e = STDIN.gets.split("\n")[0]
       puts "your input:"+ e
