@@ -1,10 +1,16 @@
 # updater
 "updater" is a ruby program which help update macports, rubygems, and pip eggs.
 
+# Requirement
+"updater" needs optparse.
+```bash
+$ gem install optparse
+```
+
 # How to Use
 ```bash
 [NOTICE] Parsing options start.
-Usage: updater [options]
+Usage: ruby updater.rb [options]
     -v, --verbose                    Verbose mode [on/off (default:on)]
     -r, --rubygem X                  Updating rubygem and gems. [on/off (default:off)]
     -p, --pip X                      Updating pip and eggs.
