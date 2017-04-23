@@ -6,6 +6,7 @@
 #
 
 require 'optparse'
+require 'open3'
 
 ##############
 # parameters #
@@ -129,6 +130,11 @@ if __FILE__ == $0
       opts[:port_clean] = true }
     o.on("-i", "--inactivate", "Perform macports uninstall inactive."){|x|
       opts[:port_inactive] = true
+      installed_list = Open3.capture3("port installed | wc | awk '{print $1}'")
+      active_list = Open3.capture3("port installed | grep active | wc | awk '{print $1}'")
+      num_installed = installed_list[0].chomp!.to_i - 1 # remove macports messages
+      num_active = active_list[0].chomp!.to_i
+      Notice("the numer of ports : installed => #{num_installed}, active => #{num_active}\n")
       print("Do You want to perform \"sudo port -v uninstall inactive\"? [YES/no]:")
       e = STDIN.gets.split("\n")[0]
       puts "your input:"+ e
