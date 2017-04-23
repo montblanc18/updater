@@ -2,9 +2,10 @@
 "updater" is a ruby program which help update macports, rubygems, and pip eggs.
 
 # Requirement
-"updater" needs optparse.
+"updater" needs optparse and open3.
 ```bash
 $ gem install optparse
+$ gem install rubysl-open3
 ```
 
 # How to Use
