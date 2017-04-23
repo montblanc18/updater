@@ -4,8 +4,7 @@
 # Requirement
 "updater" needs optparse and open3.
 ```bash
-$ gem install optparse
-$ gem install rubysl-open3
+$ gem install optparse rubysl-open3
 ```
 
 # How to Use
