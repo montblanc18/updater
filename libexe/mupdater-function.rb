@@ -12,22 +12,22 @@ Signal.trap(:INT){
 }
 
 def LogoutProcess()
-  #cmd ="growlnotify -m \"update.sh finished\""
+  #cmd ="growlnotify -m \"mupdater is finished\""
   #system(cmd)
-  puts "============================"
-  puts "=                          ="
-  puts "===  finish upgrader.rb  ==="
-  puts "=                          ="
-  puts "============================"
+  puts "========================="
+  puts "=                       ="
+  puts "===  finish mupdater  ==="
+  puts "=                       ="
+  puts "========================="
   exit
 end
 
 def StartMessage()
-	puts "============================"
-	puts "=                          ="
-	puts "===  start upgrader.rb   ==="
-	puts "=                          ="
-	puts "============================"
+	puts "========================="
+	puts "=                       ="
+	puts "===  start mupdater   ==="
+	puts "=                       ="
+	puts "========================="
 end
 
 def SkipMessage(message)

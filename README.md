@@ -5,11 +5,11 @@
 "mupdater" needs ruby, optparse and open3.
 ```bash
 $ gem install optparse rubysl-open3
+$ echo "export PATH=INSTALL_HOME_DIR/bin:$PATH" > .bashrc
 ```
 
 # How to Use
 ```bash
-[NOTICE] Parsing options start.
 Usage: mupdater [options]
     -v, --verbose                    Verbose mode [on/off (default:on)]
     -r, --rubygem X                  Updating rubygem and gems. [on/off (default:off)]
