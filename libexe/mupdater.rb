@@ -12,7 +12,7 @@ require_relative 'mupdater-function'
 ##############
 # parameters #
 ##############
-PROGRAM="update.sh"
+PROGRAM="mupdater"
 UPGRADE_OPTS="configure.optflags='-I/opt/X11/include -O2' "
 #UPGRADE_OPTS="configure.optflags='-I/opt/X11/include -O2' configure.cppflags='-I/opt/X11/include -O2'"
 PORT_OPTS="-v"
