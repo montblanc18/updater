@@ -5,8 +5,6 @@
 # rename update.rb "updater.rb"
 #
 
-require 'optparse'
-require 'open3'
 require_relative 'mupdater-function'
 
 ##############
@@ -16,6 +14,12 @@ PROGRAM="mupdater"
 UPGRADE_OPTS="configure.optflags='-I/opt/X11/include -O2' "
 #UPGRADE_OPTS="configure.optflags='-I/opt/X11/include -O2' configure.cppflags='-I/opt/X11/include -O2'"
 PORT_OPTS="-v"
+os_check = {:windows => false,
+            :macosx => true,
+            :linux => false,
+            :unix => false,
+            :unknown => false}
+
 proxy = {:port => "",
          :id => "",
          :password => "",
@@ -33,14 +37,20 @@ opts = {:port_selfupdate => true,
         :pip_update => false,
         :pip_option => true,
         :verbose_mode => true}
-
-
+  
 ##########################
 ## main
 ##########################
 if __FILE__ == $0
 
   StartMessage()
+
+  if !os_check[os] then
+    Error("This platform is #{os}.")
+    Error("This system is able to run on macosx only.\n")
+    exit(0)
+  end
+  
   Notice("Parsing options start.")
   ARGV.options do |o|
     o.on("-v", "--verbose", "Verbose mode [on/off (default:on)]"){|x|

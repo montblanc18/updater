@@ -2,6 +2,13 @@
 # codinf:utf-8
 #
 
+###############
+## library
+###############
+require 'rbconfig'
+require 'optparse'
+require 'open3'
+
 ##########################
 ## function
 ##########################
@@ -49,4 +56,22 @@ end
 
 def Error(message)
   puts "[ERROR] " + message
+end
+
+def os
+  @os ||= (
+    host_os = RbConfig::CONFIG['host_os']
+    case host_os
+    when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
+      :windows
+    when /darwin|mac os/
+      :macosx
+    when /linux/
+      :linux
+    when /solaris|bsd/
+      :unix
+    else
+      :unknown
+    end
+  )
 end
