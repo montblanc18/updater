@@ -81,13 +81,17 @@ if __FILE__ == $0
         opts[:pip_update] = false
       end
     }
-    o.on("-s", "--selfupdate", "[Skip] macports selfupdate."){|x|
-      opts[:port_selfupdate] = false
-      SkipMessage("macports selfupdate")
+    o.on("-s X", "--selfupdate X", "[Skip] macports selfupdate."){|x|
+      if "off" == x
+        opts[:port_selfupdate] = false
+        SkipMessage("macports selfupdate")
+      end
     }
-    o.on("-u", "--upgrade", "[Skip] macports upgrade installed."){|x|
-      opts[:port_upgrade] = false
-      SkipMessage("macports update installed")
+    o.on("-u X", "--upgrade X", "[Skip] macports upgrade installed."){|x|
+      if "off" == x
+        opts[:port_upgrade] = false
+        SkipMessage("macports update installed")
+      end
     }
     o.on("-c", "--clean", "Performing macports clean update"){|x|
       opts[:port_clean] = true }
@@ -201,7 +205,6 @@ if __FILE__ == $0
       SkipMessage("pip install -U eggs")
     end
   end
-  
   if opts[:port_selfupdate] then
     puts "********************************"
     puts "*    sudo port -v selfupdate   *"
