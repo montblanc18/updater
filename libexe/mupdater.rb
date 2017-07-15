@@ -36,7 +36,8 @@ opts = {:port_selfupdate => true,
         :rubygem_option => true,
         :pip_update => false,
         :pip_option => true,
-        :verbose_mode => true}
+        :verbose_mode => true,
+        :not_interactive => false}
   
 ##########################
 ## main
@@ -61,6 +62,10 @@ if __FILE__ == $0
       else
         opts[:verbose_mode] = true
       end
+    }
+    o.on("-y","--yes","Do not ask yes or not every time (all YES)"){
+      Notice("...ALL YES MODE...")
+      opts[:not_interactive] = true
     }
     o.on("-r X", "--rubygem X", "Updating rubygem and gems. [on/off (default:off)]"){|x|
       if "on" == x
@@ -172,8 +177,7 @@ if __FILE__ == $0
     cmd = "gem outdated" + opts_str
     DoCmd(cmd)
     Notice("Do you want to update all gems？")
-    print "[YES/no]:"
-    yn = gets.chomp.to_s
+    yn = YNInputWaiting(not_interactive = opts[:not_interactive])
     if "YES" == yn then
       puts "********************"
       puts "*    gem update    *"
@@ -193,8 +197,7 @@ if __FILE__ == $0
     cmd = "pip list -o --format=columns" + opts_str
     DoCmd(cmd)
     Notice("Do you want to update all eggs？")
-    print "[YES/no]:"
-    yn = gets.chomp.to_s
+    yn = YNInputWaiting(not_interactive = opts[:not_interactive])
     if "YES" == yn then
       puts "*****************************************************************************************"
       puts "*    pip freeze --local | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 pip install -U    *"
