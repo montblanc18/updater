@@ -58,13 +58,23 @@ def Error(message)
   puts "[ERROR] " + message
 end
 
+def YNInputWaiting(not_interactive = false)
+  print "[YES/no]:"
+  if true == not_interactive
+    print "\n"
+    return "YES"
+  end
+  yn = gets.chomp.to_s
+  return yn
+end
+
 def os
-  @os ||= (
-    host_os = RbConfig::CONFIG['host_os']
-    case host_os
-    when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
-      :windows
-    when /darwin|mac os/
+    @os ||= (
+      host_os = RbConfig::CONFIG['host_os']
+      case host_os
+      when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
+        :windows
+      when /darwin|mac os/
       :macosx
     when /linux/
       :linux
