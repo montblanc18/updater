@@ -61,11 +61,12 @@ end
 def YNInputWaiting(not_interactive = false)
   print "[YES/no]:"
   if true == not_interactive
-    print "\n"
-    return "YES"
+    print "YES\n"
+    return true
   end
   yn = gets.chomp.to_s
-  return yn
+  return true if "YES" == yn
+  return false
 end
 
 def os
