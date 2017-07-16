@@ -178,7 +178,7 @@ if __FILE__ == $0
     DoCmd(cmd)
     Notice("Do you want to update all gems？")
     yn = YNInputWaiting(not_interactive = opts[:not_interactive])
-    if "YES" == yn then
+    if yn then
       puts "********************"
       puts "*    gem update    *"
       puts "********************"
@@ -198,7 +198,7 @@ if __FILE__ == $0
     DoCmd(cmd)
     Notice("Do you want to update all eggs？")
     yn = YNInputWaiting(not_interactive = opts[:not_interactive])
-    if "YES" == yn then
+    if yn then
       puts "*****************************************************************************************"
       puts "*    pip freeze --local | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 pip install -U    *"
       puts "*****************************************************************************************"
