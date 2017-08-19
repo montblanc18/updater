@@ -33,6 +33,7 @@ opts = {:port_selfupdate => true,
         :port_inactive_confirmation => false,
         :proxy => false,
         :rubygem_update => false,
+        :rubygem_cleanup => false,
         :rubygem_option => true,
         :pip_update => false,
         :pip_option => true,
@@ -67,11 +68,13 @@ if __FILE__ == $0
       Notice("...ALL YES MODE...")
       opts[:not_interactive] = true
     }
-    o.on("-r X", "--rubygem X", "Updating rubygem and gems. [on/off (default:off)]"){|x|
+    o.on("-r X", "--rubygem X", "Updating or cleanup rubygem and gems. [on/off/cleanup (default:off)]"){|x|
       if "on" == x
         opts[:rubygem_update] = true
       elsif "off" == x
         opts[:rubygem_update] = false
+      elsif "cleanup" == x
+        opts[:rubygem_cleanup] = true
       else
         opts[:rubygem_update] = false
       end
@@ -186,6 +189,26 @@ if __FILE__ == $0
       DoCmd(cmd)
     else
       SkipMessage("gem update")
+    end
+  end
+  if opts[:rubygem_cleanup] then
+    opts_str = ""
+    opts_str = opts_str + " --dryrun"
+    puts "******************************"
+    puts "*    gem cleanup --dryrun    *"
+    puts "******************************"
+    cmd = "gem cleanup" + opts_str
+    DoCmd(cmd)
+    Notice("Do you want to clean up gems?")
+    yn = YNInputWaiting(not_interactive = opts[:not_interactive])
+    if yn then
+      puts "*********************"
+      puts "*    gem cleanup    *"
+      puts "*********************"
+      cmd = "gem cleanup"
+      DoCmd(cmd)
+    else
+      SkipMessage("gem cleanup")
     end
   end
   if opts[:pip_update] then
