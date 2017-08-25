@@ -12,10 +12,11 @@ $ echo "export PATH=INSTALL_HOME_DIR/bin:$PATH" > .bashrc
 ```bash
 Usage: mupdater [options]
     -v, --verbose                    Verbose mode [on/off (default:on)]
-    -r, --rubygem X                  Updating rubygem and gems. [on/off (default:off)]
+    -y, --yes                        Do not ask yes or not every time (all YES)
+    -r, --rubygem X                  Updating or cleanup rubygem and gems. [on/off/cleanup (default:off)]
     -p, --pip X                      Updating pip and eggs.
-    -s, --selfupdate                 [Skip] macports selfupdate.
-    -u, --upgrade                    [Skip] macports upgrade installed.
+    -s, --selfupdate X               [Skip] macports selfupdate.
+    -u, --upgrade X                  [Skip] macports upgrade installed.
     -c, --clean                      Performing macports clean update
     -i, --inactivate                 Perform macports uninstall inactive.
         --proxy                      Set your proxy server.
