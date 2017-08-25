@@ -9,7 +9,7 @@ $ echo "export PATH=INSTALL_HOME_DIR/bin:$PATH" > .bashrc
 ```
 
 # How to Use
-```bash
+```text
 Usage: mupdater [options]
     -v, --verbose                    Verbose mode [on/off (default:on)]
     -y, --yes                        Do not ask yes or not every time (all YES)
