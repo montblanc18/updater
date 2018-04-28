@@ -89,13 +89,13 @@ if __FILE__ == $0
         opts[:pip_update] = false
       end
     }
-    o.on("-s X", "--selfupdate X", "[Skip] macports selfupdate."){|x|
+    o.on("-s X", "--selfupdate X", "macports selfupdate.[on/off (default: on)]"){|x|
       if "off" == x
         opts[:port_selfupdate] = false
         SkipMessage("macports selfupdate")
       end
     }
-    o.on("-u X", "--upgrade X", "[Skip] macports upgrade installed."){|x|
+    o.on("-u X", "--upgrade X", "macports upgrade installed. [on/off(default: on)]"){|x|
       if "off" == x
         opts[:port_upgrade] = false
         SkipMessage("macports update installed")
