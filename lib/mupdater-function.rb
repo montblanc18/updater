@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+﻿#!/usr/bin/env ruby
 # codinf:utf-8
 #
 
@@ -19,6 +19,11 @@ Signal.trap(:INT){
 }
 
 def LogoutProcess()
+  LogoutMessage()
+  exit 0
+end
+
+def LogoutMessage()
   #cmd ="growlnotify -m \"mupdater is finished\""
   #system(cmd)
   puts "========================="
@@ -26,15 +31,14 @@ def LogoutProcess()
   puts "===  finish mupdater  ==="
   puts "=                       ="
   puts "========================="
-  exit
 end
 
 def StartMessage()
-	puts "========================="
-	puts "=                       ="
-	puts "===  start mupdater   ==="
-	puts "=                       ="
-	puts "========================="
+  puts "========================="
+  puts "=                       ="
+  puts "===  start mupdater   ==="
+  puts "=                       ="
+  puts "========================="
 end
 
 def SkipMessage(message)

@@ -7,6 +7,7 @@
 
 require_relative 'mupdater-function'
 
+
 ##############
 # parameters #
 ##############
@@ -40,6 +41,12 @@ opts = {:port_selfupdate => true,
         :verbose_mode => true,
         :not_interactive => false}
   
+
+#############
+# functions #
+#############
+
+
 ##########################
 ## main
 ##########################
