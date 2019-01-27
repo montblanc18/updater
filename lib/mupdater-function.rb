@@ -63,7 +63,7 @@ def Error(message)
 end
 
 def YNInputWaiting(not_interactive = false)
-  print "[YES/no]:"
+  print "[YES/no]: "
   if true == not_interactive
     print "YES\n"
     return true
