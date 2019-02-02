@@ -15,11 +15,6 @@ PROGRAM="mupdater"
 UPGRADE_OPTS="configure.optflags='-I/opt/X11/include -O2' "
 #UPGRADE_OPTS="configure.optflags='-I/opt/X11/include -O2' configure.cppflags='-I/opt/X11/include -O2'"
 PORT_OPTS="-v"
-os_check = {:windows => false,
-            :macosx => true,
-            :linux => false,
-            :unix => false,
-            :unknown => false}
 
 proxy = {:port => "",
          :id => "",
@@ -45,22 +40,26 @@ opts = {:port_selfupdate => true,
 #############
 # functions #
 #############
+def os_check
+  os_check = {:windows => false,
+              :macosx => true,
+              :linux => false,
+              :unix => false,
+              :unknown => false}
 
-
-##########################
-## main
-##########################
-if __FILE__ == $0
-
-  StartMessage()
-
+  Notice("This platform is #{os}.")
   if !os_check[os] then
-    Error("This platform is #{os}.")
     Error("This system is able to run on macosx only.\n")
     exit(0)
+  else
+    Notice('This program supports this OS.')
   end
-  
-  Notice("Parsing options start.")
+
+end
+
+
+def opts_parse(input_opts)
+  opts = input_opts
   ARGV.options do |o|
     o.on("-v", "--verbose", "Verbose mode [on/off (default:on)]"){|x|
       if "off" == x
@@ -149,6 +148,25 @@ if __FILE__ == $0
     }
     o.parse!
   end
+
+  return opts
+  
+end
+
+
+##########################
+## main
+##########################
+if __FILE__ == $0
+
+  StartMessage()
+  os_check()
+
+  Notice("Parsing options start.")
+
+  
+  opts = opts_parse(opts)
+  
 
   #puts "...done!!!"
   Notice("Parsing options is done!!")
