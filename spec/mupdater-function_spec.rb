@@ -2,13 +2,13 @@
 
 require 'mupdater-function'
 
-RSpec.describe 'mupdater-function' do 
+RSpec.describe 'test of mupdater-function' do 
   
   describe 'LogoutProcess()' do
 
     it 'test an output of LogoutMessage.' do
       t_msg = ["=========================\n",
-	       "=                       =\n",
+	             "=                       =\n",
                "===  finish mupdater  ===\n",
                "=                       =\n",
                "=========================\n"].join
@@ -115,13 +115,11 @@ RSpec.describe 'mupdater-function' do
         t_msg = [head, msg, foot].join
         expect { YNInputWaiting(not_interactive = true) }.to output(eq(t_msg)).to_stdout
       end
-
 =begin
 I will write tests which confirm STDIN of YNInputWaiting, and os
 =end
       
     end
   end
-
   
 end
