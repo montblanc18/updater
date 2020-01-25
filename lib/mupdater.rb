@@ -43,7 +43,7 @@ opts = {:port_selfupdate => true,
 def os_check
   os_check = {:windows => false,
               :macosx => true,
-              :linux => false,
+              :linux => true,
               :unix => false,
               :unknown => false}
 
@@ -144,10 +144,18 @@ def opts_parse(input_opts)
                            proxy[:password],
                            proxy[:domain],
                            proxy[:port])
-      # puts proxy[:url]
     }
     o.parse!
   end
+
+  # Not mac os
+  if os != :macosx
+    # all of values invloving in MacPorts shoud be false 
+    keys = [:port_selfupdate, :port_upgrade, :port_clean, :port_inactive, :port_inactive_confirmation, :port_inactivate_confirmation]
+    for key in keys
+      opts[key] = false
+    end
+  end 
 
   return opts
   
