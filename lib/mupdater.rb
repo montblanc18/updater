@@ -49,7 +49,7 @@ def os_check
 
   Notice("This platform is #{os}.")
   if !os_check[os] then
-    Error("This system is able to run on macosx only.\n")
+    Error("This system is able to run on macosx or linux.\n")
     exit(0)
   else
     Notice('This program supports this OS.')
