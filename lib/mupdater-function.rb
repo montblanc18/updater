@@ -40,7 +40,7 @@ def start_message
 end
 
 def skip_message(message)
-  puts '[SKIP] ' + message + '...\n'
+  puts '[SKIP] ' + message + '...'
 end
 
 def do_cmd(cmd)
@@ -62,13 +62,12 @@ end
 
 def yn_input_waiting(not_interactive)
   print '[YES/no]: '
-  if not_interactive == true
-    print 'YES\n'
-    true
+  if not_interactive
+    puts 'YES'
+    return true
   end
   yn = gets.chomp.to_s
-  true if yn == 'YES'
-  false
+  yn == 'YES'
 end
 
 def os
