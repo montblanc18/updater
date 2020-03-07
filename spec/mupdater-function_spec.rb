@@ -4,25 +4,25 @@ require 'mupdater-function'
 
 RSpec.describe 'test of mupdater-function' do 
   
-  describe 'LogoutProcess()' do
+  describe 'logout_process()' do
 
-    it 'test an output of LogoutMessage.' do
+    it 'test an output of logout_message.' do
       t_msg = ["=========================\n",
 	             "=                       =\n",
                "===  finish mupdater  ===\n",
                "=                       =\n",
                "=========================\n"].join
-      expect {LogoutMessage() }.to output(eq(t_msg)).to_stdout
+      expect {logout_message() }.to output(eq(t_msg)).to_stdout
     end	
     
-    it 'confirm the behavor of "exit" via LogoutProcess.' do
-      expect { LogoutProcess() }.to raise_error SystemExit
+    it 'confirm the behavor of "exit" via logout_process.' do
+      expect { logout_process() }.to raise_error SystemExit
     end
 
   end
   
 
-  describe 'StartMessage()' do
+  describe 'start_message()' do
 
     it 'confirm output.' do
       t_msg = ["=========================\n",
@@ -30,82 +30,82 @@ RSpec.describe 'test of mupdater-function' do
                "===  start mupdater   ===\n",
                "=                       =\n",
                "=========================\n"].join
-      expect { StartMessage() }.to output(eq(t_msg)).to_stdout
+      expect { start_message() }.to output(eq(t_msg)).to_stdout
     end
 
   end
 
   
-  describe 'SkipMessage(message)' do
+  describe 'skip_message(message)' do
 
-    it 'test an output of SkipMessage' do
+    it 'test an output of skip_message' do
       msg = "This is Test Message"
       head = "[SKIP] "
       foot = "...\n"
       t_msg = [head, msg, foot].join
-      expect { SkipMessage(msg) }.to output(eq(t_msg)).to_stdout
+      expect { skip_message(msg) }.to output(eq(t_msg)).to_stdout
     end
 
   end
 
   
-  describe 'DoCmd(cmd)' do
+  describe 'do_cmd(cmd)' do
 
-    it 'test an behavour of DoCmd via echo command' do
+    it 'test an behavour of do_cmd via echo command' do
       msg = "This is sample message for this test."
       cmd = "echo '" + msg + "'"
       t_msg = cmd + "\n" #+ msg + "\n"
-      expect { DoCmd(cmd) }.to output(eq(t_msg)).to_stdout
+      expect { do_cmd(cmd) }.to output(eq(t_msg)).to_stdout
     end
 
   end
 
   
-  describe 'Notice(message)' do
+  describe 'notice(message)' do
 
-    it 'test an output of Notice' do
+    it 'test an output of notice' do
       msg = "This is Test Message"
-      head = "[NOTICE] "
+      head = "[notice] "
       foot = "\n"
       t_msg = [head, msg, foot].join
-      expect { Notice(msg) }.to output(eq(t_msg)).to_stdout
+      expect { notice(msg) }.to output(eq(t_msg)).to_stdout
     end
     
   end
 
   describe 'Waring(message)' do
 
-    it 'test an output of Warning' do
+    it 'test an output of warning' do
       msg = "This is Test Message"
-      head = "[WARNING] "
+      head = "[warning] "
       foot = "\n"
       t_msg = [head, msg, foot].join
-      expect { Warning(msg) }.to output(eq(t_msg)).to_stdout
+      expect { warning(msg) }.to output(eq(t_msg)).to_stdout
     end
     
   end
 
   
-  describe 'Error(message)' do
+  describe 'error(message)' do
 
-    it 'test an output of Error' do
+    it 'test an output of error' do
       msg = "This is Test Message"
-      head = "[ERROR] "
+      head = "[error] "
       foot = "\n"
       t_msg = [head, msg, foot].join
-      expect { Error(msg) }.to output(eq(t_msg)).to_stdout
+      expect { error(msg) }.to output(eq(t_msg)).to_stdout
     end
 
   end
 
   
-  describe 'YNInputWaiting(not_interactive = false)' do
+  describe 'yn_input_waiting(not_interactive = false)' do
 
 
     context 'case) return = true' do
 
       example 'if "not_interactice = true" is set ' do
-        expect(YNInputWaiting(not_interactive = true)).to eq(true)
+        expect(yn_input_waiting(not_interactive = true)).to eq(true)
       end
 
       specify 'confirm an output if "not_interactice = true" is set ' do
@@ -113,10 +113,10 @@ RSpec.describe 'test of mupdater-function' do
         head = ""
         foot = "\n"
         t_msg = [head, msg, foot].join
-        expect { YNInputWaiting(not_interactive = true) }.to output(eq(t_msg)).to_stdout
+        expect { yn_input_waiting(not_interactive = true) }.to output(eq(t_msg)).to_stdout
       end
 =begin
-I will write tests which confirm STDIN of YNInputWaiting, and os
+I will write tests which confirm STDIN of yn_input_waiting, and os
 =end
       
     end
