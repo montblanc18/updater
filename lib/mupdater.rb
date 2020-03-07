@@ -1,287 +1,270 @@
 #!/usr/bin/env ruby
-# -*- coding: utf-8 -*-
-#
-# convert update.sh to update.rb
-# rename update.rb "updater.rb"
-#
+# frozen_string_literal: true
 
 require_relative 'mupdater-function'
-
 
 ##############
 # parameters #
 ##############
-PROGRAM="mupdater"
-UPGRADE_OPTS="configure.optflags='-I/opt/X11/include -O2' "
-#UPGRADE_OPTS="configure.optflags='-I/opt/X11/include -O2' configure.cppflags='-I/opt/X11/include -O2'"
-PORT_OPTS="-v"
+PROGRAM       = 'mupdater'
+UPGRADE_OPTS  = 'configure.optflags="-I/opt/X11/include -O2" '
+PORT_OPTS     = '-v'
 
-proxy = {:port => "",
-         :id => "",
-         :password => "",
-         :domain => "",
-         :url => ""}
+proxy = { port: '',
+          id: '',
+          password: '',
+          domain: '',
+          url: '' }
 
-opts = {:port_selfupdate => true,
-        :port_upgrade => true,
-        :port_clean => false,
-        :port_inactive => false,
-        :port_inactive_confirmation => false,
-        :proxy => false,
-        :rubygem_update => false,
-        :rubygem_cleanup => false,
-        :rubygem_option => true,
-        :pip_update => false,
-        :pip_option => true,
-        :verbose_mode => true,
-        :not_interactive => false}
-  
+opts = {  port_selfupdate: true,
+          port_upgrade: true,
+          port_clean: false,
+          port_inactive: false,
+          port_inactive_confirmation: false,
+          proxy: false,
+          rubygem_update: false,
+          rubygem_cleanup: false,
+          rubygem_option: true,
+          pip_update: false,
+          pip_option: true,
+          verbose_mode: true,
+          not_interactive: false }
 
 #############
 # functions #
 #############
 def os_check
-  os_check = {:windows => false,
-              :macosx => true,
-              :linux => true,
-              :unix => false,
-              :unknown => false}
-
-  Notice("This platform is #{os}.")
-  if !os_check[os] then
-    Error("This system is able to run on macosx or linux.\n")
-    exit(0)
-  else
-    Notice('This program supports this OS.')
-  end
-
+  os_check = {  windows: false,
+                macosx: true,
+                linux: true,
+                unix: false,
+                unknown: false }
+  notice("This platform is #{os}.")
+  os_check[os]
 end
-
 
 def opts_parse(input_opts)
   opts = input_opts
   ARGV.options do |o|
-    o.on("-v", "--verbose", "Verbose mode [on/off (default:on)]"){|x|
-      if "off" == x
-        opts[:verbose_mode] = false
-      elsif "on" == x
-        opts[:verbose_mode] = true
-      else
-        opts[:verbose_mode] = true
-      end
-    }
-    o.on("-y","--yes","Do not ask yes or not every time (all YES)"){
-      Notice("...ALL YES MODE...")
+    o.on('-v', '--verbose', 'Verbose mode [on/off (default:on)]') do |x|
+      opts[:verbose_mode] = if x == 'off'
+                              false
+                            else
+                              true
+                            end
+    end
+    o.on('-y', '--yes', 'Do not ask yes or not every time (all YES)') do
+      notice('...ALL YES MODE...')
       opts[:not_interactive] = true
-    }
-    o.on("-r X", "--rubygem X", "Updating or cleanup rubygem and gems. [on/off/cleanup (default:off)]"){|x|
-      if "on" == x
+    end
+    o.on('-r X', '--rubygem X', 'Updating or cleanup rubygem and gems. [on/off/cleanup (default:off)]') do |x|
+      if x == 'on'
         opts[:rubygem_update] = true
-      elsif "off" == x
+      elsif x == 'off'
         opts[:rubygem_update] = false
-      elsif "cleanup" == x
+      elsif x == 'cleanup'
         opts[:rubygem_cleanup] = true
       else
         opts[:rubygem_update] = false
       end
-      # SkipMessage("rubygem update")
-    }
-    o.on("-p X","--pip","Updating pip and eggs."){|x|
-      if "on" == x
-        opts[:pip_update] = true
-      elsif "off" == x
-        opts[:pip_update] = false
-      else
-        opts[:pip_update] = false
-      end
-    }
-    o.on("-s X", "--selfupdate X", "macports selfupdate.[on/off (default: on)]"){|x|
-      if "off" == x
+    end
+    o.on('-p X', '--pip', 'Updating pip and eggs.') do |x|
+      opts[:pip_update] = if x == 'on'
+                            true
+                          else
+                            false
+                          end
+    end
+    o.on('-s X', '--selfupdate X', 'macports selfupdate.[on/off (default: on)]') do |x|
+      if x == 'off'
         opts[:port_selfupdate] = false
-        SkipMessage("macports selfupdate")
+        skip_message('macports selfupdate')
       end
-    }
-    o.on("-u X", "--upgrade X", "macports upgrade installed. [on/off(default: on)]"){|x|
-      if "off" == x
+    end
+    o.on('-u X', '--upgrade X', 'macports upgrade installed. [on/off(default: on)]') do |x|
+      if x == 'off'
         opts[:port_upgrade] = false
-        SkipMessage("macports update installed")
+        skip_message('macports update installed')
       end
-    }
-    o.on("-c", "--clean", "Performing macports clean update"){|x|
-      opts[:port_clean] = true }
-    o.on("-i", "--inactivate", "Perform macports uninstall inactive."){|x|
+    end
+    o.on('-c', '--clean', 'Performing macports clean update') do
+      opts[:port_clean] = true
+    end
+    o.on('-i', '--inactivate', 'Perform macports uninstall inactive.') do
       opts[:port_inactive] = true
-      installed_list = Open3.capture3("port installed | wc | awk '{print $1}'")
-      active_list = Open3.capture3("port installed | grep active | wc | awk '{print $1}'")
+      installed_list = Open3.capture3('port installed | wc | awk \'{print $1}\'')
+      active_list = Open3.capture3('port installed | grep active | wc | awk \'{print $1}\'')
       num_installed = installed_list[0].chomp!.to_i - 1 # remove macports messages
       num_active = active_list[0].chomp!.to_i
-      Notice("the numer of ports : installed => #{num_installed}, active => #{num_active}\n")
-      print("Do You want to perform \"sudo port -v uninstall inactive\"? [YES/no]:")
-      e = STDIN.gets.split("\n")[0]
-      puts "your input:"+ e
-      if e == "YES".to_s
+      notice("the numer of ports : installed => #{num_installed},
+             active => #{num_active}\n")
+      print('Do You want to exec "sudo port -v uninstall inactive"? [YES/no]:')
+      e = STDIN.gets.split('\n')[0]
+      puts 'your input:' + e
+      if e == 'YES'.to_s
         opts[:port_inactivate_confirmation] = true
-        Notice("Start !")
+        notice('Start !')
       else
-        Notice("Cancel \"sudo port -v uninstall inactive\"")
+        notice('Cancel \'sudo port -v uninstall inactive\'')
       end
-    }
-    o.on("--proxy", "Set your proxy server."){
+    end
+    o.on('--proxy', 'Set your proxy server.') do
       opts[:rubygem_option] = true
       opts[:pip_option] = true
       opts[:proxy] = true
-      Notice("Set your proxy environment [id / password / domain / port].")
-      print "id?: "
+      notice('Set your proxy environment [id / password / domain / port].')
+      print 'id?: '
       proxy[:id] = gets.chomp.to_s
-      print "password?: "
+      print 'password?: '
       proxy[:password] = gets.chomp.to_s
-      print "domain?: "
+      print 'domain?: '
       proxy[:domain] = gets.chomp.to_s
-      print "port?: "
+      print 'port?: '
       proxy[:port] = gets.chomp.to_s
-      proxy[:url] = sprintf("http://%s:%s@%s:%s",
-                           proxy[:id],
-                           proxy[:password],
-                           proxy[:domain],
-                           proxy[:port])
-    }
+      proxy[:url] = format('http://%<id>s:%<password>s@%<domain>s:%<port>s',
+                            proxy[:id], proxy[:password], proxy[:domain], proxy[:port])
+    end
     o.parse!
   end
 
   # Not mac os
   if os != :macosx
-    # all of values invloving in MacPorts shoud be false 
-    keys = [:port_selfupdate, :port_upgrade, :port_clean, :port_inactive, :port_inactive_confirmation, :port_inactivate_confirmation]
-    for key in keys
-      opts[key] = false
+    # all of values invloving in MacPorts shoud be false
+    keys = %I[  port_selfupdate
+                port_upgrade
+                port_clean
+                port_inactive
+                port_inactive_confirmation
+                port_inactivate_confirmation  ]
+    keys.each do |k|
+      opts[k] = false
     end
-  end 
-
-  return opts
-  
+  end
+  opts
 end
-
 
 ##########################
 ## main
 ##########################
-if __FILE__ == $0
+if __FILE__ == $PROGRAM_NAME
 
-  StartMessage()
-  os_check()
+  start_message
+  error('This OS is not supported.') unless os_check
 
-  Notice("Parsing options start.")
-
-  
+  notice('Parsing options start.')
   opts = opts_parse(opts)
-  
+  notice('Parsing options is done!!')
 
-  #puts "...done!!!"
-  Notice("Parsing options is done!!")
-  
-  if opts[:port_inactive] and opts[:port_inactivate_confirmation] then
-    puts "*****************************************"
-    puts "*    sudo port -v uninstall inactive    *"
-    puts "*****************************************"
-    #sudo port -v uninstall inactive
-    #sudo port -d uninstall inactive
+  if opts[:port_inactive] && opts[:port_inactivate_confirmation]
+    puts '*****************************************'
+    puts '*    sudo port -v uninstall inactive    *'
+    puts '*****************************************'
     cmd = "sudo port #{PORT_OPTS} uninstall inactive"
-    DoCmd(cmd)
-    LogoutProcess()
+    do_cmd(cmd)
+    logout_process
   end
-  if opts[:port_clean] then
-    puts "***************************************"
-    puts "*    sudo port -v clean installed     *"
-    puts "***************************************"
+  if opts[:port_clean]
+    puts '***************************************'
+    puts '*    sudo port -v clean installed     *'
+    puts '***************************************'
     cmd = "sudo port #{PORT_OPTS} clean --all installed"
-    DoCmd(cmd)
-    LogoutProcess()
+    do_cmd(cmd)
+    logout_process
   end
-  if opts[:rubygem_update] then
+  if opts[:rubygem_update]
     # set options for rubygem
-    opts_str = ""
-    opts_str = opts_str + " --verbose" if opts[:rubygem_option] == true
-    opts_str = opts_str + " --remote --http-proxy=#{proxy[:url]}" if opts[:proxy] == true
-    puts "*****************************"
-    puts "*    gem update --system    *"
-    puts "*****************************"
-    cmd = "gem update --system" + opts_str
-    DoCmd(cmd)
-    puts "**********************"
-    puts "*    gem outdated    *"
-    puts "**********************"
-    cmd = "gem outdated" + opts_str
-    DoCmd(cmd)
-    Notice("Do you want to update all gems？")
-    yn = YNInputWaiting(not_interactive = opts[:not_interactive])
-    if yn then
-      puts "********************"
-      puts "*    gem update    *"
-      puts "********************"
-      cmd = "gem update" + opts_str
-      DoCmd(cmd)
+    opts_str = ''
+    opts_str += ' --verbose' if opts[:rubygem_option] == true
+    opts_str += " --remote --http-proxy=#{proxy[:url]}" if opts[:proxy] == true
+    puts '*****************************'
+    puts '*    gem update --system    *'
+    puts '*****************************'
+    cmd = 'gem update --system'
+    cmd += opts_str
+    do_cmd(cmd)
+    puts '**********************'
+    puts '*    gem outdated    *'
+    puts '**********************'
+    cmd = 'gem outdated'
+    cmd += opts_str
+    do_cmd(cmd)
+    notice('Do you want to update all gems？')
+    yn = yn_input_waiting(opts[:not_interactive])
+    if yn
+      puts '********************'
+      puts '*    gem update    *'
+      puts '********************'
+      cmd = 'gem update'
+      cmd += opts_str
+      do_cmd(cmd)
     else
-      SkipMessage("gem update")
+      skip_message('gem update')
     end
   end
-  if opts[:rubygem_cleanup] then
-    opts_str = ""
-    opts_str = opts_str + " --dryrun"
-    puts "******************************"
-    puts "*    gem cleanup --dryrun    *"
-    puts "******************************"
-    cmd = "gem cleanup" + opts_str
-    DoCmd(cmd)
-    Notice("Do you want to clean up gems?")
-    yn = YNInputWaiting(not_interactive = opts[:not_interactive])
-    if yn then
-      puts "*********************"
-      puts "*    gem cleanup    *"
-      puts "*********************"
-      cmd = "gem cleanup"
-      DoCmd(cmd)
+  if opts[:rubygem_cleanup]
+    opts_str = ''
+    opts_str += ' --dryrun'
+    puts '******************************'
+    puts '*    gem cleanup --dryrun    *'
+    puts '******************************'
+    cmd = 'gem cleanup'
+    cmd += opts_str
+    do_cmd(cmd)
+    notice('Do you want to clean up gems?')
+    yn = yn_input_waiting(opts[:not_interactive])
+    if yn
+      puts '*********************'
+      puts '*    gem cleanup    *'
+      puts '*********************'
+      cmd = 'gem cleanup'
+      do_cmd(cmd)
     else
-      SkipMessage("gem cleanup")
+      skip_message('gem cleanup')
     end
   end
-  if opts[:pip_update] then
-    puts "ongoing..."
-    opts_str = "" # clear str tempolary
-    puts "************************************"
-    puts "*    pip list -o --format=columns  *"
-    puts "************************************"
-    cmd = "pip list -o --format=columns" + opts_str
-    DoCmd(cmd)
-    Notice("Do you want to update all eggs？")
-    yn = YNInputWaiting(not_interactive = opts[:not_interactive])
-    if yn then
-      puts "*****************************************************************************************"
-      puts "*    pip freeze --local | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 pip install -U    *"
-      puts "*****************************************************************************************"
-      cmd = "pip freeze --local | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 pip install -U" + opts_str
-      DoCmd(cmd)
+  if opts[:pip_update]
+    puts 'ongoing...'
+    opts_str = '' # clear str tempolary
+    puts '************************************'
+    puts '*    pip list -o --format=columns  *'
+    puts '************************************'
+    cmd = 'pip list -o --format=columns'
+    cmd += opts_str
+    do_cmd(cmd)
+    notice('Do you want to update all eggs？')
+    yn = yn_input_waiting(opts[:not_interactive])
+    if yn
+      puts '*****************************************************************************************'
+      puts '*    pip freeze --local | grep -v "^\-e" | cut -d = -f 1  | xargs -n1 pip install -U    *'
+      puts '*****************************************************************************************'
+      cmd = 'pip freeze --local'
+      cmd += ' | grep -v "^\-e"'
+      cmd += ' | cut -d = -f 1'
+      cmd += ' | xargs -n1 pip install -U'
+      cmd += opts_str
+      do_cmd(cmd)
     else
-      SkipMessage("pip install -U eggs")
+      skip_message('pip install -U eggs')
     end
   end
-  if opts[:port_selfupdate] then
-    puts "********************************"
-    puts "*    sudo port -v selfupdate   *"
-    puts "********************************"
+  if opts[:port_selfupdate]
+    puts '********************************'
+    puts '*    sudo port -v selfupdate   *'
+    puts '********************************'
     cmd = "sudo port #{PORT_OPTS} selfupdate"
-    DoCmd(cmd)
-    puts "**********************"
-    puts "*    port outdated   *"
-    puts "**********************"
-    cmd = "port outdated"
-    DoCmd(cmd)
+    do_cmd(cmd)
+    puts '**********************'
+    puts '*    port outdated   *'
+    puts '**********************'
+    cmd = 'port outdated'
+    do_cmd(cmd)
   end
-  if opts[:port_upgrade] then
-    puts "****************************************"
-    puts "*    sudo port -v upgrade installed    *"
-    puts "****************************************"
+  if opts[:port_upgrade]
+    puts '****************************************'
+    puts '*    sudo port -v upgrade installed    *'
+    puts '****************************************'
     cmd = "sudo port #{PORT_OPTS} upgrade installed #{UPGRADE_OPTS}"
-    DoCmd(cmd)
+    do_cmd(cmd)
   end
-  LogoutProcess()
+  logout_process
 end

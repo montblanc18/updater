@@ -13,64 +13,62 @@ require 'open3'
 ## function
 ##########################
 # Ctrl + C trap
-Signal.trap(:INT){
-  puts "SIGINT"
+Signal.trap(:INT) do
+  puts 'SIGINT'
   exit(0)
-}
+end
 
-def LogoutProcess()
-  LogoutMessage()
+def logout_process
+  logout_message
   exit 0
 end
 
-def LogoutMessage()
-  #cmd ="growlnotify -m \"mupdater is finished\""
-  #system(cmd)
-  puts "========================="
-  puts "=                       ="
-  puts "===  finish mupdater  ==="
-  puts "=                       ="
-  puts "========================="
+def logout_message
+  puts '========================='
+  puts '=                       ='
+  puts '===  finish mupdater  ==='
+  puts '=                       ='
+  puts '========================='
 end
 
-def StartMessage()
-  puts "========================="
-  puts "=                       ="
-  puts "===  start mupdater   ==="
-  puts "=                       ="
-  puts "========================="
+def start_message
+  puts '========================='
+  puts '=                       ='
+  puts '===  start mupdater   ==='
+  puts '=                       ='
+  puts '========================='
 end
 
-def SkipMessage(message)
-  puts "[SKIP] " + message + "...\n"
+def skip_message(message)
+  puts '[SKIP] ' + message + '...\n'
 end
 
-def DoCmd(cmd)
+def do_cmd(cmd)
   puts cmd
   system(cmd)
 end
 
-def Notice(message)
-  puts "[NOTICE] " + message
+def notice(message)
+  puts '[INFO] ' + message
 end
 
-def Warning(message)
-  puts "[WARNING] " + message
+def warning(message)
+  puts '[WARN] ' + message
 end
 
-def Error(message)
-  puts "[ERROR] " + message
+def error(message)
+  puts '[ERR] ' + message
 end
 
-def YNInputWaiting(not_interactive = false)
-  print "[YES/no]: "
-  if true == not_interactive
-    print "YES\n"
-    return true
+def yn_input_waiting(not_interactive)
+  print '[YES/no]: '
+  if not_interactive == true
+    print 'YES\n'
+    true
   end
   yn = gets.chomp.to_s
-  return true if "YES" == yn
-  return false
+  true if yn == 'YES'
+  false
 end
 
 def os
