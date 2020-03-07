@@ -47,17 +47,14 @@ def opts_parse(input_opts)
   opts = input_opts
   ARGV.options do |o|
     o.on('-v', '--verbose', 'Verbose mode [on/off (default:on)]') do |x|
-      opts[:verbose_mode] = if x == 'off'
-                              false
-                            else
-                              true
-                            end
+      opts[:verbose_mode] = x != 'off'
     end
     o.on('-y', '--yes', 'Do not ask yes or not every time (all YES)') do
       notice('...ALL YES MODE...')
       opts[:not_interactive] = true
     end
-    o.on('-r X', '--rubygem X', 'Updating or cleanup rubygem and gems. [on/off/cleanup (default:off)]') do |x|
+    o.on('-r X', '--rubygem X',
+         'Updating or cleanup rubygem and gems. [on/off/cleanup]') do |x|
       if x == 'on'
         opts[:rubygem_update] = true
       elsif x == 'off'
@@ -69,19 +66,15 @@ def opts_parse(input_opts)
       end
     end
     o.on('-p X', '--pip', 'Updating pip and eggs.') do |x|
-      opts[:pip_update] = if x == 'on'
-                            true
-                          else
-                            false
-                          end
+      opts[:pip_update] = x == 'on'
     end
-    o.on('-s X', '--selfupdate X', 'macports selfupdate.[on/off (default: on)]') do |x|
+    o.on('-s X', '--selfupdate X', 'macports selfupdate.[on/off]') do |x|
       if x == 'off'
         opts[:port_selfupdate] = false
         skip_message('macports selfupdate')
       end
     end
-    o.on('-u X', '--upgrade X', 'macports upgrade installed. [on/off(default: on)]') do |x|
+    o.on('-u X', '--upgrade X', 'macports upgrade installed. [on/off]') do |x|
       if x == 'off'
         opts[:port_upgrade] = false
         skip_message('macports update installed')
@@ -92,9 +85,12 @@ def opts_parse(input_opts)
     end
     o.on('-i', '--inactivate', 'Perform macports uninstall inactive.') do
       opts[:port_inactive] = true
-      installed_list = Open3.capture3('port installed | wc | awk \'{print $1}\'')
-      active_list = Open3.capture3('port installed | grep active | wc | awk \'{print $1}\'')
-      num_installed = installed_list[0].chomp!.to_i - 1 # remove macports messages
+      cmd = 'port installed | wc | awk \'{print $1}\''
+      installed_list = Open3.capture3(cmd)
+      cmd = 'port installed | grep active | wc | awk \'{print $1}\''
+      active_list = Open3.capture3(cmd)
+      # remove macports messages
+      num_installed = installed_list[0].chomp!.to_i - 1
       num_active = active_list[0].chomp!.to_i
       notice("the numer of ports : installed => #{num_installed},
              active => #{num_active}\n")
@@ -122,7 +118,10 @@ def opts_parse(input_opts)
       print 'port?: '
       proxy[:port] = gets.chomp.to_s
       proxy[:url] = format('http://%<id>s:%<password>s@%<domain>s:%<port>s',
-                            proxy[:id], proxy[:password], proxy[:domain], proxy[:port])
+                           proxy[:id],
+                           proxy[:password],
+                           proxy[:domain],
+                           proxy[:port])
     end
     o.parse!
   end
@@ -234,9 +233,9 @@ if __FILE__ == $PROGRAM_NAME
     notice('Do you want to update all eggs？')
     yn = yn_input_waiting(opts[:not_interactive])
     if yn
-      puts '*****************************************************************************************'
-      puts '*    pip freeze --local | grep -v "^\-e" | cut -d = -f 1  | xargs -n1 pip install -U    *'
-      puts '*****************************************************************************************'
+      puts '******************************'
+      puts '*    Updating pip modules    *'
+      puts '******************************'
       cmd = 'pip freeze --local'
       cmd += ' | grep -v "^\-e"'
       cmd += ' | cut -d = -f 1'
