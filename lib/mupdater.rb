@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require_relative 'mupdater-function'
+require_relative 'mupdater_function'
 
 ##############
 # parameters #
@@ -43,8 +43,16 @@ def os_check
   os_check[os]
 end
 
-def opts_parse(input_opts)
-  opts = input_opts
+##########################
+## main
+##########################
+if __FILE__ == $PROGRAM_NAME
+
+  start_message
+  error('This OS is not supported.') unless os_check
+
+  notice('Parsing options start.')
+  # rubocop:disable Metrics/BlockLength
   ARGV.options do |o|
     o.on('-v', '--verbose', 'Verbose mode [on/off (default:on)]') do |x|
       opts[:verbose_mode] = x != 'off'
@@ -92,14 +100,12 @@ def opts_parse(input_opts)
       # remove macports messages
       num_installed = installed_list[0].chomp!.to_i - 1
       num_active = active_list[0].chomp!.to_i
-      notice("the numer of ports : installed => #{num_installed},
-             active => #{num_active}\n")
-      print('Do You want to exec "sudo port -v uninstall inactive"? [YES/no]:')
-      e = STDIN.gets.split('\n')[0]
-      puts 'your input:' + e
-      if e == 'YES'.to_s
+      notice('the numer of ports :')
+      notice("installed => #{num_installed}, active => #{num_active}\n")
+      notice('Do You want to exec "sudo port -v uninstall inactive"?')
+      if yn_input_waiting(opts[:not_interactive])
         opts[:port_inactivate_confirmation] = true
-        notice('Start !')
+        notice('Start uninstall inactive ports!')
       else
         notice('Cancel \'sudo port -v uninstall inactive\'')
       end
@@ -117,14 +123,18 @@ def opts_parse(input_opts)
       proxy[:domain] = gets.chomp.to_s
       print 'port?: '
       proxy[:port] = gets.chomp.to_s
+      # rubocop:disable Lint/FormatParameterMismatch
       proxy[:url] = format('http://%<id>s:%<password>s@%<domain>s:%<port>s',
                            proxy[:id],
                            proxy[:password],
                            proxy[:domain],
                            proxy[:port])
+      # rubocop:enable Lint/FormatParameterMismatch
     end
     o.parse!
   end
+  # rubocop:enable Metrics/BlockLength
+  notice('Finish to parse opts.')
 
   # Not mac os
   if os != :macosx
@@ -139,19 +149,6 @@ def opts_parse(input_opts)
       opts[k] = false
     end
   end
-  opts
-end
-
-##########################
-## main
-##########################
-if __FILE__ == $PROGRAM_NAME
-
-  start_message
-  error('This OS is not supported.') unless os_check
-
-  notice('Parsing options start.')
-  opts = opts_parse(opts)
   notice('Parsing options is done!!')
 
   if opts[:port_inactive] && opts[:port_inactivate_confirmation]

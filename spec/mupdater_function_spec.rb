@@ -1,9 +1,10 @@
-﻿# coding: utf-8
+﻿#!/usr/bin/env ruby
+# frozen_string_literal: true
 
-require 'mupdater-function'
+require 'mupdater_function'
 
-RSpec.describe 'test of mupdater-function' do 
-
+# rubocop:disable Metrics/BlockLength
+RSpec.describe 'test of mupdater-function' do
   describe 'logout_process()' do
     it 'test an output of logout_message.' do
       t_msg = ["=========================\n",
@@ -11,7 +12,7 @@ RSpec.describe 'test of mupdater-function' do
                "===  finish mupdater  ===\n",
                "=                       =\n",
                "=========================\n"].join
-      expect {logout_message }.to output(eq(t_msg)).to_stdout
+      expect { logout_message }.to output(eq(t_msg)).to_stdout
     end
 
     it 'confirm the behavor of "exit" via logout_process.' do
@@ -26,7 +27,7 @@ RSpec.describe 'test of mupdater-function' do
                "===  start mupdater   ===\n",
                "=                       =\n",
                "=========================\n"].join
-      expect { start_message() }.to output(eq(t_msg)).to_stdout
+      expect { start_message }.to output(eq(t_msg)).to_stdout
     end
   end
 
@@ -95,3 +96,4 @@ RSpec.describe 'test of mupdater-function' do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength:

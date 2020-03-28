@@ -1,4 +1,7 @@
-﻿require 'mupdater'
+﻿#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'mupdater'
 
 RSpec.describe 'test of mupdate' do
   describe 'os_check' do

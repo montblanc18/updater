@@ -1,6 +1,5 @@
 ﻿#!/usr/bin/env ruby
-# codinf:utf-8
-#
+# frozen_string_literal: true
 
 ###############
 ## library
@@ -70,7 +69,9 @@ def yn_input_waiting(not_interactive)
   yn == 'YES'
 end
 
+# rubocop:disable Metrics/MethodLength
 def os
+  # rubocop:disable Style/MultilineMemoization
   @os ||= (
     host_os = RbConfig::CONFIG['host_os']
     case host_os
@@ -86,4 +87,6 @@ def os
       :unknown
     end
   )
+  # rubocop:enable Style/MultilineMemoization
 end
+# rubocop:enable Metrics/MethodLength
