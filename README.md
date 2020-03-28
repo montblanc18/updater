@@ -29,10 +29,15 @@ Usage: mupdater [options]
 # Support
 
 This program support macos or linux.
-If your platform is not macosx, `mupdater` does not execute all commands which run macports.
+If your platform is not macosx or linux, `mupdater` does not execute all commands which run macports.
 
 # Development
 This porgram is tested by RSpec.
 ```text
 $ rspec
+```
+
+Please use `rubocop` before merge.
+```text
+$ rubocop
 ```
