@@ -5,13 +5,10 @@ orbs:
 jobs:
   build:
     docker:
-      - image: circleci/ruby:2.4.2-jessie-node
+      - image: circleci/ruby:2.6.3-jessie-node
     executor: ruby/default
     steps:
       - checkout
-      - run:
-          name: Update bundler 
-          command: gem install bundler:2.1.4
       - run:
           name: Which bundler?
           command: bundle -v
