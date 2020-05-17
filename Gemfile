@@ -1,4 +1,6 @@
-source "rubygems"
-gem "rubocop"
-gem "rspec"
-gem "open3"
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
+gem 'open3'
+gem 'rspec'
+gem 'rubocop'
