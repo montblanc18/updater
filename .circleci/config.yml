@@ -1,0 +1,26 @@
+version: 2.1
+orbs:
+  ruby: circleci/ruby@0.1.2 
+
+jobs:
+  build:
+    docker:
+      - image: circleci/ruby:2.7-buster
+    executor: ruby/default
+    steps:
+      - checkout
+      - run:
+          name: Update bundler 
+          command: gem install bundler:2.1.4 || bundle update
+      - run:
+          name: Which bundler?
+          command: bundle -v
+      - run:
+          name: Install bundle
+          command: bundle check || bundle install
+      - run:
+          name: rubocop
+          command: bundle exec rubocop
+      - run:
+          name: rspec
+          command: bundle exec rspec
