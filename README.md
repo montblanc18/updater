@@ -1,7 +1,6 @@
 # mupdater
 
-[![CircleCI](https://circleci.com/gh/montblanc18/mupdater.svg?style=svg)](https://circleci.com/gh/montblanc18/mupdater)
-
+[![CircleCI](https://circleci.com/gh/montblanc18/mupdater/tree/develop.svg?style=shield)](https://circleci.com/gh/montblanc18/mupdater/tree/develop)
 
 `mupdater` is a ruby program which help update macports, rubygems, and pip modules.
 mupdater means "my updater".
