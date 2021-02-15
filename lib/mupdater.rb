@@ -131,6 +131,19 @@ if __FILE__ == $PROGRAM_NAME
                            proxy[:port])
       # rubocop:enable Lint/FormatParameterMismatch
     end
+    o.on('-T X', '--TimeMachine X',
+         'checking status of TimeMachine for macOS and\
+          delete its local backup data which ocupies its SSD.[check/cleanup]') do |x|
+      if os != :macosx
+        puts 'This option is valid on macOS only.'
+        break
+      end
+      if x == 'check'
+        opts[:time_machine_check] = true
+      elsif x == 'cleanup'
+        opts[:time_machine_cleanup] = true
+      end
+    end
     o.parse!
   end
   # rubocop:enable Metrics/BlockLength
@@ -150,6 +163,23 @@ if __FILE__ == $PROGRAM_NAME
     end
   end
   notice('Parsing options is done!!')
+  if opts[:time_machine_check]
+    puts '*************************************'
+    puts '*    tmutil listlocalsnapshots /    *'
+    puts '*************************************'
+    cmd = 'tmutil listlocalsnapshots /'
+    do_cmd(cmd)
+    logout_process
+  end
+
+  if opts[:time_machine_cleanup]
+    puts '******************************'
+    puts '*    cleanup Time Machine    *'
+    puts '******************************'
+    cmd = "for d in `tmutil listlocalsnapshots / | awk -F'.\' \'\{print $4\}\'`; do sudo tmutil deletelocalsnapshots $d; done"
+    do_cmd(cmd)
+    logout_process
+  end
 
   if opts[:port_inactive] && opts[:port_inactivate_confirmation]
     puts '*****************************************'
