@@ -44,8 +44,8 @@ RSpec.describe 'test of mupdater-function' do
   describe 'do_cmd(cmd)' do
     it 'test an behavour of do_cmd via echo command' do
       msg = 'This is sample message for this test.'
-      cmd = "echo '" + msg + "'"
-      t_msg = cmd + "\n" #+ msg + "\n"
+      cmd = format("echo '%s'", msg)
+      t_msg = format("%s\n", cmd) #+ msg + "\n"
       expect { do_cmd(cmd) }.to output(eq(t_msg)).to_stdout
     end
   end

@@ -63,11 +63,12 @@ if __FILE__ == $PROGRAM_NAME
     end
     o.on('-r X', '--rubygem X',
          'Updating or cleanup rubygem and gems. [on/off/cleanup]') do |x|
-      if x == 'on'
+      case x
+      when 'on'
         opts[:rubygem_update] = true
-      elsif x == 'off'
+      when 'off'
         opts[:rubygem_update] = false
-      elsif x == 'cleanup'
+      when 'cleanup'
         opts[:rubygem_cleanup] = true
       else
         opts[:rubygem_update] = false
@@ -138,10 +139,13 @@ if __FILE__ == $PROGRAM_NAME
         puts 'This option is valid on macOS only.'
         break
       end
-      if x == 'check'
+      case x
+      when 'check'
         opts[:time_machine_check] = true
-      elsif x == 'cleanup'
+      when 'cleanup'
         opts[:time_machine_cleanup] = true
+      else
+        warning('invalid option. skip this args.')
       end
     end
     o.parse!
@@ -176,7 +180,8 @@ if __FILE__ == $PROGRAM_NAME
     puts '******************************'
     puts '*    cleanup Time Machine    *'
     puts '******************************'
-    cmd = "for d in `tmutil listlocalsnapshots / | awk -F'.\' \'\{print $4\}\'`; do sudo tmutil deletelocalsnapshots $d; done"
+    cmd = "for d in `tmutil listlocalsnapshots / | awk -F'.\' \'\{print $4\}\'`;\
+     do sudo tmutil deletelocalsnapshots $d; done"
     do_cmd(cmd)
     logout_process
   end
