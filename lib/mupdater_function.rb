@@ -43,7 +43,7 @@ def skip_message(message)
 end
 
 def do_cmd(cmd)
-  puts cmd
+  puts '[CMD] ' + cmd
   system(cmd)
 end
 
