@@ -134,7 +134,8 @@ if __FILE__ == $PROGRAM_NAME
     end
     o.on('-T X', '--TimeMachine X',
          'checking status of TimeMachine for macOS and\
-          delete its local backup data which ocupies its SSD.[check/cleanup]') do |x|
+          delete its local backup data which ocupies its SSD.\
+          [check/cleanup]') do |x|
       if os != :macosx
         puts 'This option is valid on macOS only.'
         break
@@ -180,7 +181,8 @@ if __FILE__ == $PROGRAM_NAME
     puts '******************************'
     puts '*    cleanup Time Machine    *'
     puts '******************************'
-    cmd = "for d in `tmutil listlocalsnapshots / | awk -F'.\' \'\{print $4\}\'`;\
+    cmd = "for d in `tmutil listlocalsnapshots /\
+     | awk -F'.\' \'\{print $4\}\'`;\
      do sudo tmutil deletelocalsnapshots $d; done"
     do_cmd(cmd)
     logout_process
