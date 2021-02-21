@@ -4,7 +4,7 @@
 require 'mupdater_function'
 
 # rubocop:disable Metrics/BlockLength
-RSpec.describe MupdaterFunction do
+RSpec.describe TestMupdaterFunction do
   describe 'logout_process()' do
     # rubocop:disable RSpec/ExampleLength
     it 'test an output of logout_message.' do
