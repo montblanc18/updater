@@ -4,8 +4,9 @@
 require 'mupdater_function'
 
 # rubocop:disable Metrics/BlockLength
-RSpec.describe 'test of mupdater-function' do
+RSpec.describe MupdaterFunction do
   describe 'logout_process()' do
+    # rubocop:disable RSpec/ExampleLength
     it 'test an output of logout_message.' do
       t_msg = ["=========================\n",
                "=                       =\n",
@@ -14,6 +15,7 @@ RSpec.describe 'test of mupdater-function' do
                "=========================\n"].join
       expect { logout_message }.to output(eq(t_msg)).to_stdout
     end
+    # rubocop:enable RSpec/ExampleLength
 
     it 'confirm the behavor of "exit" via logout_process.' do
       expect { logout_process }.to raise_error SystemExit
@@ -21,6 +23,7 @@ RSpec.describe 'test of mupdater-function' do
   end
 
   describe 'start_message()' do
+    # rubocop:disable RSpec/ExampleLength
     it 'confirm output.' do
       t_msg = ["=========================\n",
                "=                       =\n",
@@ -29,6 +32,7 @@ RSpec.describe 'test of mupdater-function' do
                "=========================\n"].join
       expect { start_message }.to output(eq(t_msg)).to_stdout
     end
+    # rubocop:enable RSpec/ExampleLength
   end
 
   describe 'skip_message(message)' do
@@ -81,7 +85,7 @@ RSpec.describe 'test of mupdater-function' do
   end
 
   describe 'yn_input_waiting(not_interactive = false)' do
-    context 'case) return = true' do
+    context 'when) return = true' do
       example 'if "not_interactice = true" is set ' do
         expect(yn_input_waiting(true)).to eq(true)
       end

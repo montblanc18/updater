@@ -39,24 +39,24 @@ def start_message
 end
 
 def skip_message(message)
-  puts format('[SKIP] %s...', message)
+  puts format('[SKIP] %<message>s...', message)
 end
 
 def do_cmd(cmd)
-  puts format('[CMD] %s', cmd)
+  puts format('[CMD] %<cmd>s', cmd)
   system(cmd)
 end
 
 def notice(message)
-  puts format('[INFO] %s', message)
+  puts format('[INFO] %<message>s', message)
 end
 
 def warning(message)
-  puts format('[WARN] %s', message)
+  puts format('[WARN] %<message>s', message)
 end
 
 def error(message)
-  puts format('[ERR] %s', message)
+  puts format('[ERR] %<message>s', message)
 end
 
 def yn_input_waiting(not_interactive)
