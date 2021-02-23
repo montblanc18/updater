@@ -103,3 +103,6 @@ RSpec.configure do |config|
 =end
 # rubocop:enable Style/BlockComments, Layout/CommentIndentation
 end
+
+require 'simplecov'
+SimpleCov.start
