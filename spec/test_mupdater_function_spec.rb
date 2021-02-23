@@ -4,7 +4,7 @@
 require 'mupdater_function'
 
 # rubocop:disable Metrics/BlockLength
-RSpec.describe TestMupdaterFunction do
+RSpec.describe 'TestMupdaterFunction' do
   describe 'logout_process()' do
     # rubocop:disable RSpec/ExampleLength
     it 'test an output of logout_message.' do
@@ -49,7 +49,7 @@ RSpec.describe TestMupdaterFunction do
     it 'test an behavour of do_cmd via echo command' do
       msg = 'This is sample message for this test.'
       cmd = format("echo '%s'", msg)
-      t_msg = format("%s\n", cmd) #+ msg + "\n"
+      t_msg = ['[CMD] ', cmd, "\n"].join
       expect { do_cmd(cmd) }.to output(eq(t_msg)).to_stdout
     end
   end
