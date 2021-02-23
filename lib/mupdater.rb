@@ -63,11 +63,12 @@ if __FILE__ == $PROGRAM_NAME
     end
     o.on('-r X', '--rubygem X',
          'Updating or cleanup rubygem and gems. [on/off/cleanup]') do |x|
-      if x == 'on'
+      case x
+      when 'on'
         opts[:rubygem_update] = true
-      elsif x == 'off'
+      when 'off'
         opts[:rubygem_update] = false
-      elsif x == 'cleanup'
+      when 'cleanup'
         opts[:rubygem_cleanup] = true
       else
         opts[:rubygem_update] = false
@@ -131,6 +132,23 @@ if __FILE__ == $PROGRAM_NAME
                            proxy[:port])
       # rubocop:enable Lint/FormatParameterMismatch
     end
+    o.on('-T X', '--TimeMachine X',
+         'checking status of TimeMachine for macOS and\
+          delete its local backup data which ocupies its SSD.\
+          [check/cleanup]') do |x|
+      if os != :macosx
+        puts 'This option is valid on macOS only.'
+        break
+      end
+      case x
+      when 'check'
+        opts[:time_machine_check] = true
+      when 'cleanup'
+        opts[:time_machine_cleanup] = true
+      else
+        warning('invalid option. skip this args.')
+      end
+    end
     o.parse!
   end
   # rubocop:enable Metrics/BlockLength
@@ -150,6 +168,25 @@ if __FILE__ == $PROGRAM_NAME
     end
   end
   notice('Parsing options is done!!')
+  if opts[:time_machine_check]
+    puts '*************************************'
+    puts '*    tmutil listlocalsnapshots /    *'
+    puts '*************************************'
+    cmd = 'tmutil listlocalsnapshots /'
+    do_cmd(cmd)
+    logout_process
+  end
+
+  if opts[:time_machine_cleanup]
+    puts '******************************'
+    puts '*    cleanup Time Machine    *'
+    puts '******************************'
+    cmd = "for d in `tmutil listlocalsnapshots /\
+     | awk -F'.\' \'\{print $4\}\'`;\
+     do sudo tmutil deletelocalsnapshots $d; done"
+    do_cmd(cmd)
+    logout_process
+  end
 
   if opts[:port_inactive] && opts[:port_inactivate_confirmation]
     puts '*****************************************'

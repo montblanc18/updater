@@ -3,7 +3,7 @@
 
 require 'mupdater'
 
-RSpec.describe 'test of mupdate' do
+RSpec.describe 'TestMupdater' do
   describe 'os_check' do
     example 'if os is macosx is set' do
       expect(os_check).to eq true if os == :macosx
