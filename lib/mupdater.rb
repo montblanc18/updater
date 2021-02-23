@@ -43,116 +43,119 @@ def os_check
   os_check[os]
 end
 
+#################
+# option parser #
+#################
+notice('Parsing options start.')
+# rubocop:disable Metrics/BlockLength
+ARGV.options do |o|
+  o.on('-v', '--verbose', 'Verbose mode [on/off (default:on)]') do |x|
+    opts[:verbose_mode] = x != 'off'
+  end
+  o.on('-y', '--yes', 'Do not ask yes or not every time (all YES)') do
+    notice('...ALL YES MODE...')
+    opts[:not_interactive] = true
+  end
+  o.on('-r X', '--rubygem X',
+       'Updating or cleanup rubygem and gems. [on/off/cleanup]') do |x|
+    case x
+    when 'on'
+      opts[:rubygem_update] = true
+    when 'off'
+      opts[:rubygem_update] = false
+    when 'cleanup'
+      opts[:rubygem_cleanup] = true
+    else
+      opts[:rubygem_update] = false
+    end
+  end
+  o.on('-p X', '--pip', 'Updating pip and eggs.') do |x|
+    opts[:pip_update] = x == 'on'
+  end
+  o.on('-s X', '--selfupdate X', 'macports selfupdate.[on/off]') do |x|
+    if x == 'off'
+      opts[:port_selfupdate] = false
+      skip_message('macports selfupdate')
+    end
+  end
+  o.on('-u X', '--upgrade X', 'macports upgrade installed. [on/off]') do |x|
+    if x == 'off'
+      opts[:port_upgrade] = false
+      skip_message('macports update installed')
+    end
+  end
+  o.on('-c', '--clean', 'Performing macports clean update') do
+    opts[:port_clean] = true
+  end
+  o.on('-i', '--inactivate', 'Perform macports uninstall inactive.') do
+    opts[:port_inactive] = true
+    cmd = 'port installed | wc | awk \'{print $1}\''
+    installed_list = Open3.capture3(cmd)
+    cmd = 'port installed | grep active | wc | awk \'{print $1}\''
+    active_list = Open3.capture3(cmd)
+    # remove macports messages
+    num_installed = installed_list[0].chomp!.to_i - 1
+    num_active = active_list[0].chomp!.to_i
+    notice('the numer of ports :')
+    notice("installed => #{num_installed}, active => #{num_active}\n")
+    notice('Do You want to exec "sudo port -v uninstall inactive"?')
+    if yn_input_waiting(opts[:not_interactive])
+      opts[:port_inactivate_confirmation] = true
+      notice('Start uninstall inactive ports!')
+    else
+      notice('Cancel \'sudo port -v uninstall inactive\'')
+    end
+  end
+  o.on('--proxy', 'Set your proxy server.') do
+    opts[:rubygem_option] = true
+    opts[:pip_option] = true
+    opts[:proxy] = true
+    notice('Set your proxy environment [id / password / domain / port].')
+    print 'id?: '
+    proxy[:id] = gets.chomp.to_s
+    print 'password?: '
+    proxy[:password] = gets.chomp.to_s
+    print 'domain?: '
+    proxy[:domain] = gets.chomp.to_s
+    print 'port?: '
+    proxy[:port] = gets.chomp.to_s
+    # rubocop:disable Lint/FormatParameterMismatch
+    proxy[:url] = format('http://%<id>s:%<password>s@%<domain>s:%<port>s',
+                         proxy[:id],
+                         proxy[:password],
+                         proxy[:domain],
+                         proxy[:port])
+    # rubocop:enable Lint/FormatParameterMismatch
+  end
+  o.on('-T X', '--TimeMachine X',
+       'checking status of TimeMachine for macOS and\
+        delete its local backup data which ocupies its SSD.\
+        [check/cleanup]') do |x|
+    if os != :macosx
+      puts 'This option is valid on macOS only.'
+      break
+    end
+    case x
+    when 'check'
+      opts[:time_machine_check] = true
+    when 'cleanup'
+      opts[:time_machine_cleanup] = true
+    else
+      warning('invalid option. skip this args.')
+    end
+  end
+  o.parse!
+end
+# rubocop:enable Metrics/BlockLength
+notice('Finish to parse opts.')
+
 ##########################
 ## main
 ##########################
-if __FILE__ == $PROGRAM_NAME
 
+if __FILE__ == $PROGRAM_NAME
   start_message
   error('This OS is not supported.') unless os_check
-
-  notice('Parsing options start.')
-  # rubocop:disable Metrics/BlockLength
-  ARGV.options do |o|
-    o.on('-v', '--verbose', 'Verbose mode [on/off (default:on)]') do |x|
-      opts[:verbose_mode] = x != 'off'
-    end
-    o.on('-y', '--yes', 'Do not ask yes or not every time (all YES)') do
-      notice('...ALL YES MODE...')
-      opts[:not_interactive] = true
-    end
-    o.on('-r X', '--rubygem X',
-         'Updating or cleanup rubygem and gems. [on/off/cleanup]') do |x|
-      case x
-      when 'on'
-        opts[:rubygem_update] = true
-      when 'off'
-        opts[:rubygem_update] = false
-      when 'cleanup'
-        opts[:rubygem_cleanup] = true
-      else
-        opts[:rubygem_update] = false
-      end
-    end
-    o.on('-p X', '--pip', 'Updating pip and eggs.') do |x|
-      opts[:pip_update] = x == 'on'
-    end
-    o.on('-s X', '--selfupdate X', 'macports selfupdate.[on/off]') do |x|
-      if x == 'off'
-        opts[:port_selfupdate] = false
-        skip_message('macports selfupdate')
-      end
-    end
-    o.on('-u X', '--upgrade X', 'macports upgrade installed. [on/off]') do |x|
-      if x == 'off'
-        opts[:port_upgrade] = false
-        skip_message('macports update installed')
-      end
-    end
-    o.on('-c', '--clean', 'Performing macports clean update') do
-      opts[:port_clean] = true
-    end
-    o.on('-i', '--inactivate', 'Perform macports uninstall inactive.') do
-      opts[:port_inactive] = true
-      cmd = 'port installed | wc | awk \'{print $1}\''
-      installed_list = Open3.capture3(cmd)
-      cmd = 'port installed | grep active | wc | awk \'{print $1}\''
-      active_list = Open3.capture3(cmd)
-      # remove macports messages
-      num_installed = installed_list[0].chomp!.to_i - 1
-      num_active = active_list[0].chomp!.to_i
-      notice('the numer of ports :')
-      notice("installed => #{num_installed}, active => #{num_active}\n")
-      notice('Do You want to exec "sudo port -v uninstall inactive"?')
-      if yn_input_waiting(opts[:not_interactive])
-        opts[:port_inactivate_confirmation] = true
-        notice('Start uninstall inactive ports!')
-      else
-        notice('Cancel \'sudo port -v uninstall inactive\'')
-      end
-    end
-    o.on('--proxy', 'Set your proxy server.') do
-      opts[:rubygem_option] = true
-      opts[:pip_option] = true
-      opts[:proxy] = true
-      notice('Set your proxy environment [id / password / domain / port].')
-      print 'id?: '
-      proxy[:id] = gets.chomp.to_s
-      print 'password?: '
-      proxy[:password] = gets.chomp.to_s
-      print 'domain?: '
-      proxy[:domain] = gets.chomp.to_s
-      print 'port?: '
-      proxy[:port] = gets.chomp.to_s
-      # rubocop:disable Lint/FormatParameterMismatch
-      proxy[:url] = format('http://%<id>s:%<password>s@%<domain>s:%<port>s',
-                           proxy[:id],
-                           proxy[:password],
-                           proxy[:domain],
-                           proxy[:port])
-      # rubocop:enable Lint/FormatParameterMismatch
-    end
-    o.on('-T X', '--TimeMachine X',
-         'checking status of TimeMachine for macOS and\
-          delete its local backup data which ocupies its SSD.\
-          [check/cleanup]') do |x|
-      if os != :macosx
-        puts 'This option is valid on macOS only.'
-        break
-      end
-      case x
-      when 'check'
-        opts[:time_machine_check] = true
-      when 'cleanup'
-        opts[:time_machine_cleanup] = true
-      else
-        warning('invalid option. skip this args.')
-      end
-    end
-    o.parse!
-  end
-  # rubocop:enable Metrics/BlockLength
-  notice('Finish to parse opts.')
 
   # Not mac os
   if os != :macosx
