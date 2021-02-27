@@ -96,6 +96,19 @@ RSpec.describe 'TestMupdaterFunction' do
     end
   end
 
+  describe 'print_message' do
+    it 'test desplay message' do
+      msg = 'describe msg'
+      num = msg.size
+      l = ''
+      (0..num - 1 + 6).each do |_i|
+        l += '*'
+      end
+      t_msg = [l, "\n", format('*  %<message>s  *', message: msg), "\n", l, "\n"].join
+      expect { print_message(msg) }.to output(eq(t_msg)).to_stdout
+    end
+  end
+
   describe 'os function' do
     os_back = RbConfig::CONFIG['host_os']
     it 'when) mswin' do

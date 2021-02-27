@@ -43,6 +43,7 @@ def os_check
   os_check[os]
 end
 
+
 #################
 # option parser #
 #################
@@ -146,6 +147,19 @@ ARGV.options do |o|
   end
   o.parse!
 end
+# Not mac os
+if os != :macosx
+  # all of values invloving in MacPorts shoud be false
+  keys = %I[  port_selfupdate
+              port_upgrade
+              port_clean
+              port_inactive
+              port_inactive_confirmation
+              port_inactivate_confirmation  ]
+  keys.each do |k|
+    opts[k] = false
+  end
+end
 # rubocop:enable Metrics/BlockLength
 notice('Finish to parse opts.')
 
@@ -157,33 +171,16 @@ if __FILE__ == $PROGRAM_NAME
   start_message
   error('This OS is not supported.') unless os_check
 
-  # Not mac os
-  if os != :macosx
-    # all of values invloving in MacPorts shoud be false
-    keys = %I[  port_selfupdate
-                port_upgrade
-                port_clean
-                port_inactive
-                port_inactive_confirmation
-                port_inactivate_confirmation  ]
-    keys.each do |k|
-      opts[k] = false
-    end
-  end
   notice('Parsing options is done!!')
   if opts[:time_machine_check]
-    puts '*************************************'
-    puts '*    tmutil listlocalsnapshots /    *'
-    puts '*************************************'
+    print_message('tmutil listlocalsnapshots /')
     cmd = 'tmutil listlocalsnapshots /'
     do_cmd(cmd)
     logout_process
   end
 
   if opts[:time_machine_cleanup]
-    puts '******************************'
-    puts '*    cleanup Time Machine    *'
-    puts '******************************'
+    print_message('cleanup Time Machine')
     cmd = "for d in `tmutil listlocalsnapshots /\
      | awk -F'.\' \'\{print $4\}\'`;\
      do sudo tmutil deletelocalsnapshots $d; done"
@@ -192,17 +189,13 @@ if __FILE__ == $PROGRAM_NAME
   end
 
   if opts[:port_inactive] && opts[:port_inactivate_confirmation]
-    puts '*****************************************'
-    puts '*    sudo port -v uninstall inactive    *'
-    puts '*****************************************'
+    print_message('sudo port -v uninstall inactive')
     cmd = "sudo port #{PORT_OPTS} uninstall inactive"
     do_cmd(cmd)
     logout_process
   end
   if opts[:port_clean]
-    puts '***************************************'
-    puts '*    sudo port -v clean installed     *'
-    puts '***************************************'
+    print_message('sudo port -v clean installed')
     cmd = "sudo port #{PORT_OPTS} clean --all installed"
     do_cmd(cmd)
     logout_process
@@ -212,24 +205,18 @@ if __FILE__ == $PROGRAM_NAME
     opts_str = ''
     opts_str += ' --verbose' if opts[:rubygem_option] == true
     opts_str += " --remote --http-proxy=#{proxy[:url]}" if opts[:proxy] == true
-    puts '*****************************'
-    puts '*    gem update --system    *'
-    puts '*****************************'
+    print_message('gem update --system')
     cmd = 'gem update --system'
     cmd += opts_str
     do_cmd(cmd)
-    puts '**********************'
-    puts '*    gem outdated    *'
-    puts '**********************'
+    print_message('gem outdated')
     cmd = 'gem outdated'
     cmd += opts_str
     do_cmd(cmd)
     notice('Do you want to update all gems？')
     yn = yn_input_waiting(opts[:not_interactive])
     if yn
-      puts '********************'
-      puts '*    gem update    *'
-      puts '********************'
+      print_message('gem update')
       cmd = 'gem update'
       cmd += opts_str
       do_cmd(cmd)
@@ -240,18 +227,14 @@ if __FILE__ == $PROGRAM_NAME
   if opts[:rubygem_cleanup]
     opts_str = ''
     opts_str += ' --dryrun'
-    puts '******************************'
-    puts '*    gem cleanup --dryrun    *'
-    puts '******************************'
+    print_message('gem cleanup --dryrun')
     cmd = 'gem cleanup'
     cmd += opts_str
     do_cmd(cmd)
     notice('Do you want to clean up gems?')
     yn = yn_input_waiting(opts[:not_interactive])
     if yn
-      puts '*********************'
-      puts '*    gem cleanup    *'
-      puts '*********************'
+      print_message('gem cleanup')
       cmd = 'gem cleanup'
       do_cmd(cmd)
     else
@@ -261,18 +244,14 @@ if __FILE__ == $PROGRAM_NAME
   if opts[:pip_update]
     puts 'ongoing...'
     opts_str = '' # clear str tempolary
-    puts '************************************'
-    puts '*    pip list -o --format=columns  *'
-    puts '************************************'
+    print_message('pip list -o --format=columns')
     cmd = 'pip list -o --format=columns'
     cmd += opts_str
     do_cmd(cmd)
     notice('Do you want to update all eggs？')
     yn = yn_input_waiting(opts[:not_interactive])
     if yn
-      puts '******************************'
-      puts '*    Updating pip modules    *'
-      puts '******************************'
+      print_message('Updating pip modules')
       cmd = 'pip freeze --local'
       cmd += ' | grep -v "^\-e"'
       cmd += ' | cut -d = -f 1'
@@ -284,21 +263,15 @@ if __FILE__ == $PROGRAM_NAME
     end
   end
   if opts[:port_selfupdate]
-    puts '********************************'
-    puts '*    sudo port -v selfupdate   *'
-    puts '********************************'
+    print_message('sudo port -v selfupdate')
     cmd = "sudo port #{PORT_OPTS} selfupdate"
     do_cmd(cmd)
-    puts '**********************'
-    puts '*    port outdated   *'
-    puts '**********************'
+    print_message('port outdated')
     cmd = 'port outdated'
     do_cmd(cmd)
   end
   if opts[:port_upgrade]
-    puts '****************************************'
-    puts '*    sudo port -v upgrade installed    *'
-    puts '****************************************'
+    print_message('sudo port -v upgrade installed')
     cmd = "sudo port #{PORT_OPTS} upgrade installed #{UPGRADE_OPTS}"
     do_cmd(cmd)
   end
