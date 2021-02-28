@@ -3,6 +3,7 @@
 
 require 'mupdater'
 
+# rubocop:disable Metrics/BlockLength
 RSpec.describe 'TestMupdater' do
   describe 'os_check' do
     example 'if os is macosx is set' do
@@ -47,3 +48,4 @@ RSpec.describe 'TestMupdater' do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

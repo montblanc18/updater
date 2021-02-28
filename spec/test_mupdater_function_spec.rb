@@ -175,4 +175,4 @@ RSpec.describe 'TestMupdaterFunction' do
     RbConfig::CONFIG['host_os'] = os_back
   end
 end
-# rubocop:enable Metrics/BlockLength:
+# rubocop:enable Metrics/BlockLength
