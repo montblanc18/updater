@@ -47,7 +47,6 @@ RSpec.describe 'TestMupdaterFunction' do
       cmd = format("echo '%s'", msg)
       t_msg = ['[CMD] ', cmd, "\n"].join
       expect(self).to receive(:system)
-      print('sss')
       expect { do_cmd(cmd) }.to output(eq(t_msg)).to_stdout
     end
 
