@@ -43,7 +43,6 @@ def os_check
   os_check[os]
 end
 
-
 #################
 # option parser #
 #################
@@ -164,116 +163,170 @@ end
 notice('Finish to parse opts.')
 
 ##########################
+## function
+##########################
+###
+# time machine
+###
+def time_machine_listdiplay
+  print_message('tmutil listlocalsnapshots /')
+  cmd = 'tmutil listlocalsnapshots /'
+  do_cmd(cmd)
+  true
+end
+
+def time_machine_checker
+  print_message('cleanup Time Machine')
+  cmd = "for d in `tmutil listlocalsnapshots /\
+   | awk -F'.\' \'\{print $4\}\'`;\
+   do sudo tmutil deletelocalsnapshots $d; done"
+  do_cmd(cmd)
+end
+
+###
+# macports
+###
+def macport_inactive_uninstaller
+  print_message('sudo port -v uninstall inactive')
+  cmd = "sudo port #{PORT_OPTS} uninstall inactive"
+  do_cmd(cmd)
+end
+
+def macport_cleaner
+  print_message('sudo port -v clean installed')
+  cmd = "sudo port #{PORT_OPTS} clean --all installed"
+  do_cmd(cmd)
+end
+
+def macport_selfupdater
+  print_message('sudo port -v selfupdate')
+  cmd = "sudo port #{PORT_OPTS} selfupdate"
+  do_cmd(cmd)
+  print_message('port outdated')
+  cmd = 'port outdated'
+  do_cmd(cmd)
+end
+
+def macport_upgrader
+  print_message('sudo port -v upgrade installed')
+  cmd = "sudo port #{PORT_OPTS} upgrade installed #{UPGRADE_OPTS}"
+  do_cmd(cmd)
+end
+
+###
+# rubygem
+###
+def rubygem_updater_cmd(opts_str)
+  cmd = 'gem update --system'
+  cmd += opts_str
+  cmd
+end
+
+def rubygem_outdated_cmd(opts_str)
+  cmd = 'gem outdated'
+  cmd += opts_str
+  cmd
+end
+
+def rubygem_updater
+  notice('Do you want to update all gems？')
+  if yn_input_waiting(opts[:not_interactive])
+    print_message('gem update')
+    cmd = 'gem update'
+    cmd += opts_str
+    do_cmd(cmd)
+  else
+    skip_message('gem update')
+  end
+  true
+end
+
+def rubygem_opts_builder
+  opts_str = ''
+  opts_str += ' --verbose' if opts[:rubygem_option] == true
+  opts_str += " --remote --http-proxy=#{proxy[:url]}" if opts[:proxy] == true
+  opts_str
+end
+
+def rubygem_update_handler
+  opts_str = rubygem_opts_builder
+  print_message('gem update --system')
+  do_cmd(rubygem_updater_cmd(opts_str))
+  print_message('gem outdated')
+  do_cmd(rubyge_outdated_cmd(opts_str))
+  rubygem_updater
+end
+
+def rubygem_cleaner
+  notice('Do you want to clean up gems?')
+  if yn_input_waiting(opts[:not_interactive])
+    print_message('gem cleanup')
+    cmd = 'gem cleanup'
+    do_cmd(cmd)
+  else
+    skip_message('gem cleanup')
+  end
+end
+
+def rubygem_clean_handler
+  opts_str = ''
+  opts_str += ' --dryrun'
+  print_message('gem cleanup --dryrun')
+  cmd = 'gem cleanup'
+  cmd += opts_str
+  do_cmd(cmd)
+  rubygem_cleaner
+end
+
+###
+# pip
+###
+def pip_update(opts_str)
+  notice('Do you want to update all eggs？')
+  if yn_input_waiting(opts[:not_interactive])
+    print_message('Updating pip modules')
+    cmd = 'pip freeze --local | grep -v "^\-e" | cut -d = -f 1 | xargs -n1 pip install -U'
+    cmd += opts_str
+    do_cmd(cmd)
+  else
+    skip_message('pip install -U eggs')
+  end
+  true
+end
+
+def pip_update_handler
+  puts 'ongoing...'
+  opts_str = '' # clear str tempolary
+  print_message('pip list -o --format=columns')
+  cmd = 'pip list -o --format=columns'
+  cmd += opts_str
+  do_cmd(cmd)
+  pip_update(opts_str)
+end
+
+##########################
 ## main
 ##########################
+def optional_handler
+  return time_machine_listdisplay if opts[:time_machine_check]
+  return time_machine_checker if opts[:time_machine_cleanup]
+  return macport_inactive_uninstaller if opts[:port_inactive] && opts[:port_inactivate_confirmation]
+  return macport_cleaner if opts[:port_clean]
+end
+
+def main_handler
+  optional_handler
+
+  rubygem_update_handler if opts[:rubygem_update]
+  rubygem_clean_handler if opts[:rubygem_cleanup]
+  pip_update_handler if opts[:pip_update]
+  macport_selfupdater if opts[:port_selfupdate]
+  macport_upgrader if opts[:port_upgrade]
+  true
+end
 
 if __FILE__ == $PROGRAM_NAME
-  start_message
   error('This OS is not supported.') unless os_check
-
-  notice('Parsing options is done!!')
-  if opts[:time_machine_check]
-    print_message('tmutil listlocalsnapshots /')
-    cmd = 'tmutil listlocalsnapshots /'
-    do_cmd(cmd)
-    logout_process
-  end
-
-  if opts[:time_machine_cleanup]
-    print_message('cleanup Time Machine')
-    cmd = "for d in `tmutil listlocalsnapshots /\
-     | awk -F'.\' \'\{print $4\}\'`;\
-     do sudo tmutil deletelocalsnapshots $d; done"
-    do_cmd(cmd)
-    logout_process
-  end
-
-  if opts[:port_inactive] && opts[:port_inactivate_confirmation]
-    print_message('sudo port -v uninstall inactive')
-    cmd = "sudo port #{PORT_OPTS} uninstall inactive"
-    do_cmd(cmd)
-    logout_process
-  end
-  if opts[:port_clean]
-    print_message('sudo port -v clean installed')
-    cmd = "sudo port #{PORT_OPTS} clean --all installed"
-    do_cmd(cmd)
-    logout_process
-  end
-  if opts[:rubygem_update]
-    # set options for rubygem
-    opts_str = ''
-    opts_str += ' --verbose' if opts[:rubygem_option] == true
-    opts_str += " --remote --http-proxy=#{proxy[:url]}" if opts[:proxy] == true
-    print_message('gem update --system')
-    cmd = 'gem update --system'
-    cmd += opts_str
-    do_cmd(cmd)
-    print_message('gem outdated')
-    cmd = 'gem outdated'
-    cmd += opts_str
-    do_cmd(cmd)
-    notice('Do you want to update all gems？')
-    yn = yn_input_waiting(opts[:not_interactive])
-    if yn
-      print_message('gem update')
-      cmd = 'gem update'
-      cmd += opts_str
-      do_cmd(cmd)
-    else
-      skip_message('gem update')
-    end
-  end
-  if opts[:rubygem_cleanup]
-    opts_str = ''
-    opts_str += ' --dryrun'
-    print_message('gem cleanup --dryrun')
-    cmd = 'gem cleanup'
-    cmd += opts_str
-    do_cmd(cmd)
-    notice('Do you want to clean up gems?')
-    yn = yn_input_waiting(opts[:not_interactive])
-    if yn
-      print_message('gem cleanup')
-      cmd = 'gem cleanup'
-      do_cmd(cmd)
-    else
-      skip_message('gem cleanup')
-    end
-  end
-  if opts[:pip_update]
-    puts 'ongoing...'
-    opts_str = '' # clear str tempolary
-    print_message('pip list -o --format=columns')
-    cmd = 'pip list -o --format=columns'
-    cmd += opts_str
-    do_cmd(cmd)
-    notice('Do you want to update all eggs？')
-    yn = yn_input_waiting(opts[:not_interactive])
-    if yn
-      print_message('Updating pip modules')
-      cmd = 'pip freeze --local'
-      cmd += ' | grep -v "^\-e"'
-      cmd += ' | cut -d = -f 1'
-      cmd += ' | xargs -n1 pip install -U'
-      cmd += opts_str
-      do_cmd(cmd)
-    else
-      skip_message('pip install -U eggs')
-    end
-  end
-  if opts[:port_selfupdate]
-    print_message('sudo port -v selfupdate')
-    cmd = "sudo port #{PORT_OPTS} selfupdate"
-    do_cmd(cmd)
-    print_message('port outdated')
-    cmd = 'port outdated'
-    do_cmd(cmd)
-  end
-  if opts[:port_upgrade]
-    print_message('sudo port -v upgrade installed')
-    cmd = "sudo port #{PORT_OPTS} upgrade installed #{UPGRADE_OPTS}"
-    do_cmd(cmd)
-  end
+  error('main handler did not return true') if main_handler
   logout_process
 end

@@ -46,7 +46,17 @@ RSpec.describe 'TestMupdaterFunction' do
       msg = 'This is sample message for this test.'
       cmd = format("echo '%s'", msg)
       t_msg = ['[CMD] ', cmd, "\n"].join
+      expect(self).to receive(:system)
+      print('sss')
       expect { do_cmd(cmd) }.to output(eq(t_msg)).to_stdout
+    end
+
+    it 'test with mock' do
+      msg = 'This is test.'
+      cmd = format("echo '%s'", msg)
+      # t_msg = ['[CMD] ', cmd, "\n"].join
+      expect(self).to receive(:system)
+      do_cmd(cmd)
     end
   end
 
