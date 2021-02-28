@@ -6,7 +6,6 @@ require 'mupdater_function'
 # rubocop:disable Metrics/BlockLength
 RSpec.describe 'TestMupdaterFunction' do
   describe 'logout_process()' do
-    # rubocop:disable RSpec/ExampleLength
     it 'test an output of logout_message.' do
       t_msg = ["=========================\n",
                "=                       =\n",
@@ -15,7 +14,6 @@ RSpec.describe 'TestMupdaterFunction' do
                "=========================\n"].join
       expect { logout_message }.to output(eq(t_msg)).to_stdout
     end
-    # rubocop:enable RSpec/ExampleLength
 
     it 'confirm the behavor of "exit" via logout_process.' do
       expect { logout_process }.to raise_error SystemExit
@@ -23,7 +21,6 @@ RSpec.describe 'TestMupdaterFunction' do
   end
 
   describe 'start_message()' do
-    # rubocop:disable RSpec/ExampleLength
     it 'confirm output.' do
       t_msg = ["=========================\n",
                "=                       =\n",
@@ -32,7 +29,6 @@ RSpec.describe 'TestMupdaterFunction' do
                "=========================\n"].join
       expect { start_message }.to output(eq(t_msg)).to_stdout
     end
-    # rubocop:enable RSpec/ExampleLength
   end
 
   describe 'skip_message(message)' do
@@ -50,7 +46,16 @@ RSpec.describe 'TestMupdaterFunction' do
       msg = 'This is sample message for this test.'
       cmd = format("echo '%s'", msg)
       t_msg = ['[CMD] ', cmd, "\n"].join
+      expect(self).to receive(:system)
       expect { do_cmd(cmd) }.to output(eq(t_msg)).to_stdout
+    end
+
+    it 'test with mock' do
+      msg = 'This is test.'
+      cmd = format("echo '%s'", msg)
+      # t_msg = ['[CMD] ', cmd, "\n"].join
+      expect(self).to receive(:system)
+      do_cmd(cmd)
     end
   end
 
@@ -64,7 +69,7 @@ RSpec.describe 'TestMupdaterFunction' do
     end
   end
 
-  describe 'Waring(message)' do
+  describe 'waring(message)' do
     it 'test an output of warning' do
       msg = 'This is Test Message'
       head = '[WARN] '
@@ -99,5 +104,75 @@ RSpec.describe 'TestMupdaterFunction' do
       end
     end
   end
+
+  describe 'print_message' do
+    it 'test desplay message' do
+      msg = 'describe msg'
+      num = msg.size
+      l = ''
+      (0..num - 1 + 6).each do |_i|
+        l += '*'
+      end
+      t_msg = [l, "\n", format('*  %<message>s  *', message: msg), "\n", l, "\n"].join
+      expect { print_message(msg) }.to output(eq(t_msg)).to_stdout
+    end
+  end
+
+  describe 'os function' do
+    os_back = RbConfig::CONFIG['host_os']
+    it 'when) mswin' do
+      RbConfig::CONFIG['host_os'] = 'mswin'
+      expect(os).to eq(:windows)
+    end
+    it 'when) msys' do
+      RbConfig::CONFIG['host_os'] = 'msys'
+      expect(os).to eq(:windows)
+    end
+    it 'when) mingw' do
+      RbConfig::CONFIG['host_os'] = 'mingw'
+      expect(os).to eq(:windows)
+    end
+    it 'when) cygwin' do
+      RbConfig::CONFIG['host_os'] = 'cygwin'
+      expect(os).to eq(:windows)
+    end
+    it 'when) bccwin' do
+      RbConfig::CONFIG['host_os'] = 'bccwin'
+      expect(os).to eq(:windows)
+    end
+    it 'when) wince' do
+      RbConfig::CONFIG['host_os'] = 'wince'
+      expect(os).to eq(:windows)
+    end
+    it 'when) emc' do
+      RbConfig::CONFIG['host_os'] = 'emc'
+      expect(os).to eq(:windows)
+    end
+    it 'when) macosx' do
+      RbConfig::CONFIG['host_os'] = 'mac os'
+      expect(os).to eq(:macosx)
+    end
+    it 'when) darwin' do
+      RbConfig::CONFIG['host_os'] = 'darwin'
+      expect(os).to eq(:macosx)
+    end
+    it 'when) linux' do
+      RbConfig::CONFIG['host_os'] = 'linux'
+      expect(os).to eq(:linux)
+    end
+    it 'when) solaris' do
+      RbConfig::CONFIG['host_os'] = 'solaris'
+      expect(os).to eq(:unix)
+    end
+    it 'when) bsd' do
+      RbConfig::CONFIG['host_os'] = 'bsd'
+      expect(os).to eq(:unix)
+    end
+    it 'when) unkown' do
+      RbConfig::CONFIG['host_os'] = 'unkown'
+      expect(os).to eq(:unknown)
+    end
+    RbConfig::CONFIG['host_os'] = os_back
+  end
 end
-# rubocop:enable Metrics/BlockLength:
+# rubocop:enable Metrics/BlockLength

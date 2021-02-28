@@ -59,6 +59,17 @@ def error(msg)
   puts format('[ERR] %<message>s', message: msg)
 end
 
+def print_message(msg)
+  num = msg.size
+  l = ''
+  (0..num - 1 + 6).each do |_i|
+    l += '*'
+  end
+  puts l
+  puts format('*  %<message>s  *', message: msg)
+  puts l
+end
+
 def yn_input_waiting(not_interactive)
   print '[YES/no]: '
   if not_interactive
