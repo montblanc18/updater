@@ -42,9 +42,24 @@ RSpec.describe 'TestMupdater' do
       expect(rubygem_updater_cmd(opts_str)).to eq(cmd)
     end
     it 'test rubygem_outdated_cmd' do
+      opts = {}
       opts_str = ' options'
       cmd = format('gem outdated%<opts>s', opts: opts_str)
-      expect(rubygem_outdated_cmd(opts_str)).to eq(cmd)
+      expect(rubygem_outdated_cmd(opts, opts_str)).to eq(cmd)
+    end
+    context 'rubygem_cleaner yes/no' do
+      let(:opts) { {} }
+      example 'test rubygem_cleaner when it do not get YES' do
+        # 標準入力を文字列 x のオブジェクトにすり替える
+        expect(STDOUT).to receive(:puts).with('[INFO] Do you want to clean up gems?')
+        # expect(STDOUT).to receive(:print).with('[YES/no]: ')
+        # expect(STDOUT).to output('[SKIP] gem cleanup').stdout
+        allow(STDIN).to receive(:gets).and_return('')
+        expect(STDOUT).to receive(:puts).with('[SKIP] gem cleanup...')
+        $stdin = StringIO.new('')
+        rubygem_cleaner(opts)
+        $stdin = STDIN # 元に戻す
+      end
     end
   end
 end

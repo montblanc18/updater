@@ -76,8 +76,13 @@ def yn_input_waiting(not_interactive)
     puts 'YES'
     return true
   end
+  g = gets
+  return false if g.nil?
+
   yn = gets.chomp.to_s
-  yn == 'YES'
+  return true if yn == 'YES'
+
+  false
 end
 
 # rubocop:disable Metrics/MethodLength
