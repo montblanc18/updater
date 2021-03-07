@@ -79,7 +79,7 @@ def yn_input_waiting(not_interactive)
   g = gets
   return false if g.nil?
 
-  yn = gets.chomp.to_s
+  yn = g.chomp.to_s
   return true if yn == 'YES'
 
   false

@@ -4,7 +4,7 @@
 require 'mupdater'
 
 # rubocop:disable Metrics/BlockLength
-RSpec.describe 'TestMupdater' do
+RSpec.describe 'TestMupdaterFunctions' do
   describe 'os_check' do
     example 'if os is macosx is set' do
       expect(os_check).to eq true if os == :macosx
@@ -34,7 +34,9 @@ RSpec.describe 'TestMupdater' do
       macport_upgrader
     end
   end
+end
 
+RSpec.describe 'TestRubygemFunctions' do
   describe 'rubygem functions' do
     it 'test rubygem_updater_cmd' do
       opts_str = ' options'
@@ -47,18 +49,24 @@ RSpec.describe 'TestMupdater' do
       cmd = format('gem outdated%<opts>s', opts: opts_str)
       expect(rubygem_outdated_cmd(opts, opts_str)).to eq(cmd)
     end
-    context 'rubygem_cleaner yes/no' do
+  end
+  describe 'rubygem_cleaner yes/no' do
+    context 'cace) do not get YES' do
       let(:opts) { {} }
       example 'test rubygem_cleaner when it do not get YES' do
-        # 標準入力を文字列 x のオブジェクトにすり替える
-        expect(STDOUT).to receive(:puts).with('[INFO] Do you want to clean up gems?')
-        # expect(STDOUT).to receive(:print).with('[YES/no]: ')
-        # expect(STDOUT).to output('[SKIP] gem cleanup').stdout
-        allow(STDIN).to receive(:gets).and_return('')
-        expect(STDOUT).to receive(:puts).with('[SKIP] gem cleanup...')
+        # stub STDOUT & STDIN
+        expect($stdout).to receive(:puts).with('[INFO] Do you want to clean up gems?')
+        allow($stdin).to receive(:gets).and_return('')
+        expect($stdout).to receive(:puts).with('[SKIP] gem cleanup...')
         $stdin = StringIO.new('')
         rubygem_cleaner(opts)
-        $stdin = STDIN # 元に戻す
+        $stdin = STDIN
+      end
+
+      example 'test rubygem_cleaner with -y option' do
+        opts[:not_interactive] = true
+        rubygem_cleaner(opts)
+        opts[:not_interactive] = false
       end
     end
   end

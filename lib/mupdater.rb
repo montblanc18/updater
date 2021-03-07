@@ -10,12 +10,6 @@ PROGRAM       = 'mupdater'
 UPGRADE_OPTS  = 'configure.optflags="-I/opt/X11/include -O2" '
 PORT_OPTS     = '-v'
 
-proxy = { port: '',
-          id: '',
-          password: '',
-          domain: '',
-          url: '' }
-
 #############
 # functions #
 #############
@@ -33,12 +27,19 @@ end
 # option parser #
 #################
 def option_parser
+  proxy = { port: '',
+            id: '',
+            password: '',
+            domain: '',
+            url: '' }
+
   opts = { port_selfupdate: true,
            port_upgrade: true,
            port_clean: false,
            port_inactive: false,
            port_inactive_confirmation: false,
            proxy: false,
+           proxy_params: {},
            rubygem_update: false,
            rubygem_cleanup: false,
            rubygem_option: true,
@@ -126,6 +127,7 @@ def option_parser
                            proxy[:password],
                            proxy[:domain],
                            proxy[:port])
+      opts[:proxy_params] = proxy
       # rubocop:enable Lint/FormatParameterMismatch
     end
     o.on('-T X', '--TimeMachine X',
