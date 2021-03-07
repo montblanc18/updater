@@ -3,6 +3,12 @@
 
 require 'mupdater'
 
+module Kernel
+  def system(cmd)
+    puts format("Mock System Call = '%{command}s'", command: cmd)
+  end
+end
+
 # rubocop:disable Metrics/BlockLength
 RSpec.describe 'TestMupdaterFunctions' do
   describe 'os_check' do
@@ -67,6 +73,16 @@ RSpec.describe 'TestRubygemFunctions' do
         opts[:not_interactive] = true
         rubygem_cleaner(opts)
         opts[:not_interactive] = false
+      end
+    end
+    context 'cace) do not get YES' do
+      let(:opts) { {} }
+      example 'test rubygem_cleaner when it do not get YES' do
+        # stub STDOUT & STDIN
+        allow($stdin).to receive(:gets).and_return('YES')
+        $stdin = StringIO.new('')
+        rubygem_cleaner(opts)
+        $stdin = STDIN
       end
     end
   end
