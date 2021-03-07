@@ -186,6 +186,7 @@ def time_machine_checker
    | awk -F'.\' \'\{print $4\}\'`;\
    do sudo tmutil deletelocalsnapshots $d; done"
   do_cmd(cmd)
+  true
 end
 
 ###
@@ -233,8 +234,8 @@ def rubygem_outdated_cmd(_opts, opts_str)
   cmd
 end
 
-def rubygem_updater(opts)
-  notice('Do you want to update all gems？')
+def rubygem_updater(opts, opts_str)
+  notice('Do you want to update all gems?')
   if yn_input_waiting(opts[:not_interactive])
     print_message('gem update')
     cmd = 'gem update'
@@ -271,6 +272,7 @@ def rubygem_cleaner(opts)
   else
     skip_message('gem cleanup')
   end
+  true
 end
 
 def rubygem_clean_handler(_opts)
