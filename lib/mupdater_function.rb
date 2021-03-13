@@ -45,6 +45,7 @@ end
 def do_cmd(cmd)
   puts format('[CMD] %<command>s', command: cmd)
   system(cmd)
+  true
 end
 
 def notice(msg)
@@ -76,8 +77,13 @@ def yn_input_waiting(not_interactive)
     puts 'YES'
     return true
   end
-  yn = gets.chomp.to_s
-  yn == 'YES'
+  g = gets
+  return false if g.nil?
+
+  yn = g.chomp.to_s
+  return true if yn == 'YES'
+
+  false
 end
 
 # rubocop:disable Metrics/MethodLength

@@ -3,14 +3,18 @@
 
 require 'mupdater_function'
 
+module Kernel
+  def system(cmd)
+    puts format("Mock System Call = '%<command>s'", command: cmd)
+  end
+end
+
 # rubocop:disable Metrics/BlockLength
 RSpec.describe 'TestMupdaterFunction' do
   describe 'logout_process()' do
     it 'test an output of logout_message.' do
-      t_msg = ["=========================\n",
-               "=                       =\n",
-               "===  finish mupdater  ===\n",
-               "=                       =\n",
+      t_msg = ["=========================\n", "=                       =\n",
+               "===  finish mupdater  ===\n", "=                       =\n",
                "=========================\n"].join
       expect { logout_message }.to output(eq(t_msg)).to_stdout
     end
@@ -22,10 +26,8 @@ RSpec.describe 'TestMupdaterFunction' do
 
   describe 'start_message()' do
     it 'confirm output.' do
-      t_msg = ["=========================\n",
-               "=                       =\n",
-               "===  start mupdater   ===\n",
-               "=                       =\n",
+      t_msg = ["=========================\n", "=                       =\n",
+               "===  start mupdater   ===\n", "=                       =\n",
                "=========================\n"].join
       expect { start_message }.to output(eq(t_msg)).to_stdout
     end
@@ -42,20 +44,13 @@ RSpec.describe 'TestMupdaterFunction' do
   end
 
   describe 'do_cmd(cmd)' do
-    it 'test an behavour of do_cmd via echo command' do
-      msg = 'This is sample message for this test.'
-      cmd = format("echo '%s'", msg)
-      t_msg = ['[CMD] ', cmd, "\n"].join
-      expect(self).to receive(:system)
-      expect { do_cmd(cmd) }.to output(eq(t_msg)).to_stdout
-    end
-
     it 'test with mock' do
       msg = 'This is test.'
       cmd = format("echo '%s'", msg)
-      # t_msg = ['[CMD] ', cmd, "\n"].join
-      expect(self).to receive(:system)
-      do_cmd(cmd)
+      # expect(self).to have_received(:system)
+      # do_cmd(cmd)
+      allow(self).to receive(:system)
+      expect(do_cmd(cmd)).to eq(true)
     end
   end
 
@@ -106,6 +101,7 @@ RSpec.describe 'TestMupdaterFunction' do
   end
 
   describe 'print_message' do
+    # rubocop:disable RSpec/ExampleLength:
     it 'test desplay message' do
       msg = 'describe msg'
       num = msg.size
@@ -116,6 +112,7 @@ RSpec.describe 'TestMupdaterFunction' do
       t_msg = [l, "\n", format('*  %<message>s  *', message: msg), "\n", l, "\n"].join
       expect { print_message(msg) }.to output(eq(t_msg)).to_stdout
     end
+    # rubocop:enable RSpec/ExampleLength:
   end
 
   describe 'os function' do
@@ -124,54 +121,67 @@ RSpec.describe 'TestMupdaterFunction' do
       RbConfig::CONFIG['host_os'] = 'mswin'
       expect(os).to eq(:windows)
     end
+
     it 'when) msys' do
       RbConfig::CONFIG['host_os'] = 'msys'
       expect(os).to eq(:windows)
     end
+
     it 'when) mingw' do
       RbConfig::CONFIG['host_os'] = 'mingw'
       expect(os).to eq(:windows)
     end
+
     it 'when) cygwin' do
       RbConfig::CONFIG['host_os'] = 'cygwin'
       expect(os).to eq(:windows)
     end
+
     it 'when) bccwin' do
       RbConfig::CONFIG['host_os'] = 'bccwin'
       expect(os).to eq(:windows)
     end
+
     it 'when) wince' do
       RbConfig::CONFIG['host_os'] = 'wince'
       expect(os).to eq(:windows)
     end
+
     it 'when) emc' do
       RbConfig::CONFIG['host_os'] = 'emc'
       expect(os).to eq(:windows)
     end
+
     it 'when) macosx' do
       RbConfig::CONFIG['host_os'] = 'mac os'
       expect(os).to eq(:macosx)
     end
+
     it 'when) darwin' do
       RbConfig::CONFIG['host_os'] = 'darwin'
       expect(os).to eq(:macosx)
     end
+
     it 'when) linux' do
       RbConfig::CONFIG['host_os'] = 'linux'
       expect(os).to eq(:linux)
     end
+
     it 'when) solaris' do
       RbConfig::CONFIG['host_os'] = 'solaris'
       expect(os).to eq(:unix)
     end
+
     it 'when) bsd' do
       RbConfig::CONFIG['host_os'] = 'bsd'
       expect(os).to eq(:unix)
     end
+
     it 'when) unkown' do
       RbConfig::CONFIG['host_os'] = 'unkown'
       expect(os).to eq(:unknown)
     end
+
     RbConfig::CONFIG['host_os'] = os_back
   end
 end
