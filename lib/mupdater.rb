@@ -228,7 +228,7 @@ def rubygem_updater_cmd(opts_str)
   cmd
 end
 
-def rubygem_outdated_cmd(_opts, opts_str)
+def rubygem_outdated_cmd(opts_str)
   cmd = 'gem outdated'
   cmd += opts_str
   cmd
@@ -250,17 +250,17 @@ end
 def rubygem_opts_builder(opts)
   opts_str = ''
   opts_str += ' --verbose' if opts[:rubygem_option] == true
-  opts_str += " --remote --http-proxy=#{proxy[:url]}" if opts[:proxy] == true
+  opts_str += " --remote --http-proxy=#{opts[:proxy_params][:url]}" if opts[:proxy] == true
   opts_str
 end
 
 def rubygem_update_handler(opts)
-  opts_str = rubygem_opts_builder
+  opts_str = rubygem_opts_builder(opts)
   print_message('gem update --system')
-  do_cmd(rubygem_updater_cmd(opts, opts_str))
+  do_cmd(rubygem_updater_cmd(opts_str))
   print_message('gem outdated')
-  do_cmd(rubyge_outdated_cmd(opts_str))
-  rubygem_updater
+  do_cmd(rubygem_outdated_cmd(opts_str))
+  rubygem_updater(opts, opts_str)
 end
 
 def rubygem_cleaner(opts)
@@ -282,7 +282,7 @@ def rubygem_clean_handler(_opts)
   cmd = 'gem cleanup'
   cmd += opts_str
   do_cmd(cmd)
-  rubygem_cleaner
+  rubygem_cleaner(opts)
 end
 
 ###

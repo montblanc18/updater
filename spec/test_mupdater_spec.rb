@@ -71,7 +71,23 @@ RSpec.describe 'TestRubygemFunctions' do
       opts = {}
       opts_str = ' options'
       cmd = format('gem outdated%<opts>s', opts: opts_str)
-      expect(rubygem_outdated_cmd(opts, opts_str)).to eq(cmd)
+      expect(rubygem_outdated_cmd(opts_str)).to eq(cmd)
+    end
+
+    let(:opts) { {} }
+
+    it 'test rubygme_update_handler' do
+      allow($stdin).to receive(:gets).and_return('YES')
+      $stdin = StringIO.new('')
+      expect(rubygem_update_handler(opts)).to eq(true)
+      $stdin = STDIN
+    end
+
+    it 'test rubygme_clean_handler' do
+      allow($stdin).to receive(:gets).and_return('YES')
+      $stdin = StringIO.new('')
+      expect(rubygem_clean_handler(opts)).to eq(true)
+      $stdin = STDIN
     end
   end
 
@@ -125,7 +141,8 @@ RSpec.describe 'TestRubygemFunctions' do
         opts[:not_interactive] = false
       end
     end
-    context 'cace) get YES' do
+
+    context 'when) get YES' do
       let(:opts) { {} }
       example 'test rubygem_cleaner when it do not get YES' do
         # stub STDOUT & STDIN
@@ -134,6 +151,30 @@ RSpec.describe 'TestRubygemFunctions' do
         rubygem_cleaner(opts)
         $stdin = STDIN
       end
+    end
+  end
+
+  describe 'rubygem_opts_builder' do
+    let(:opts) { {} }
+    it 'test rubygem_opts_builder' do
+      opts_str = ''
+      expect(rubygem_opts_builder(opts)).to eq(opts_str)
+    end
+
+    it 'test rubygem_opts_builder w/ verbose option' do
+      opts[:rubygem_option] = true
+      opts_str = ' --verbose'
+      expect(rubygem_opts_builder(opts)).to eq(opts_str)
+      opts[:rubygem_option] = false
+    end
+
+    it 'test rubygem_opts_builder w/ proxy option' do
+      opts[:proxy] = true
+      opts[:proxy_params] = {}
+      opts[:proxy_params][:url] = 'test@example.com'
+      opts_str = " --remote --http-proxy=#{opts[:proxy_params][:url]}"
+      expect(rubygem_opts_builder(opts)).to eq(opts_str)
+      opts[:proxy] = false
     end
   end
 end

@@ -1,4 +1,7 @@
 AllCops:
   TargetRubyVersion: 2.7.2
+  Exclude:
+    - bin/*
+    - coverage/*
 
 require: rubocop-rspec
