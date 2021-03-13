@@ -296,7 +296,7 @@ end
 ###
 # pip
 ###
-def pip_update(opts, opts_str)
+def pip_updater(opts, opts_str)
   notice('Do you want to update all eggs？')
   if yn_input_waiting(opts[:not_interactive])
     print_message('Updating pip modules')
@@ -316,7 +316,7 @@ def pip_update_handler(opts)
   cmd = 'pip list -o --format=columns'
   cmd += opts_str
   do_cmd(cmd)
-  pip_update(opts, opts_str)
+  pip_updater(opts, opts_str)
 end
 
 ##########################

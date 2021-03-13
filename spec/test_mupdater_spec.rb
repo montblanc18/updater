@@ -27,18 +27,14 @@ RSpec.describe 'TestMupdaterFunctions' do
 
   describe 'macport functions' do
     it 'test macport_inactive_uninstaller' do
-      # expect(self).to receive(:system)
       macport_inactive_uninstaller
     end
 
     it 'test macport_cleaner' do
-      # expect(self).to receive(:system)
       macport_cleaner
     end
 
     it 'test macport_selfupdater' do
-      # expect(self).to receive(:system)
-      # expect(self).to receive(:system)
       macport_selfupdater
     end
 
@@ -111,7 +107,7 @@ RSpec.describe 'TestMupdaterFunctions' do
     context 'when) get YES' do
       let(:opts) { {} }
 
-      example 'test rubygem_cleaner when it do not get YES' do
+      example 'test rubygem_updater when it get YES' do
         # stub STDOUT & STDIN
         allow($stdin).to receive(:gets).and_return('YES')
         $stdin = StringIO.new('')
@@ -176,6 +172,48 @@ RSpec.describe 'TestMupdaterFunctions' do
       opts_str = " --remote --http-proxy=#{opts[:proxy_params][:url]}"
       expect(rubygem_opts_builder(opts)).to eq(opts_str)
       opts[:proxy] = false
+    end
+  end
+
+  describe 'pip functions' do
+    let(:opts) { {} }
+
+    it 'test pip_update_handler' do
+      allow($stdin).to receive(:gets).and_return('YES')
+      $stdin = StringIO.new('')
+      expect(pip_update_handler(opts)).to eq(true)
+      $stdin = STDIN
+    end
+  end
+
+  describe 'pip_updater' do
+    context 'when) do not get YES' do
+      let(:opts) { {} }
+
+      example 'test pip_updater when it do not get YES' do
+        allow($stdin).to receive(:gets).and_return('')
+        $stdin = StringIO.new('')
+        pip_updater(opts, '')
+        $stdin = STDIN
+      end
+
+      example 'test pip_updater with -y option' do
+        opts[:not_interactive] = true
+        expect(pip_updater(opts, '')).to eq(true)
+        opts[:not_interactive] = false
+      end
+    end
+
+    context 'when) get YES' do
+      let(:opts) { {} }
+
+      example 'test pip_updater when it do get YES' do
+        # stub STDOUT & STDIN
+        allow($stdin).to receive(:gets).and_return('YES')
+        $stdin = StringIO.new('')
+        expect(pip_updater(opts, '')).to eq(true)
+        $stdin = STDIN
+      end
     end
   end
 
