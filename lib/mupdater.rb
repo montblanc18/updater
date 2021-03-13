@@ -26,6 +26,11 @@ end
 #################
 # option parser #
 #################
+
+# rubocop:disable Metrics/AbcSize
+# rubocop:disable Metrics/CyclomaticComplexity
+# rubocop:disable Metrics/MethodLength
+# rubocop:disable Metrics/PerceivedComplexity
 def option_parser
   proxy = { port: '',
             id: '',
@@ -67,8 +72,6 @@ def option_parser
         opts[:rubygem_update] = false
       when 'cleanup'
         opts[:rubygem_cleanup] = true
-      else
-        opts[:rubygem_update] = false
       end
     end
     o.on('-p X', '--pip', 'Updating pip and eggs.') do |x|
@@ -166,6 +169,11 @@ def option_parser
   notice('Finish to parse opts.')
   opts
 end
+
+# rubocop:enable Metrics/AbcSize
+# rubocop:enable Metrics/CyclomaticComplexity
+# rubocop:enable Metrics/MethodLength
+# rubocop:enable Metrics/PerceivedComplexity
 
 ##########################
 ## function

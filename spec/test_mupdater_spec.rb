@@ -5,7 +5,7 @@ require 'mupdater'
 
 module Kernel
   def system(cmd)
-    puts format("Mock System Call = '%{command}s'", command: cmd)
+    puts format("Mock System Call = '%<command>s'", command: cmd)
   end
 end
 
@@ -30,23 +30,24 @@ RSpec.describe 'TestMupdaterFunctions' do
       # expect(self).to receive(:system)
       macport_inactive_uninstaller
     end
+
     it 'test macport_cleaner' do
       # expect(self).to receive(:system)
       macport_cleaner
     end
+
     it 'test macport_selfupdater' do
       # expect(self).to receive(:system)
       # expect(self).to receive(:system)
       macport_selfupdater
     end
+
     it 'test macport_upgrader' do
-      expect(self).to receive(:system)
+      allow(self).to receive(:system)
       macport_upgrader
     end
   end
-end
 
-RSpec.describe 'TestTimeMachineFunctions' do
   describe 'test listdisplay' do
     it 'test normal case' do
       expect(time_machine_listdiplay).to eq(true)
@@ -58,23 +59,21 @@ RSpec.describe 'TestTimeMachineFunctions' do
       expect(time_machine_checker).to eq(true)
     end
   end
-end
 
-RSpec.describe 'TestRubygemFunctions' do
   describe 'rubygem functions' do
+    let(:opts) { {} }
+
     it 'test rubygem_updater_cmd' do
       opts_str = ' options'
       cmd = format('gem update --system%<opts>s', opts: opts_str)
       expect(rubygem_updater_cmd(opts_str)).to eq(cmd)
     end
+
     it 'test rubygem_outdated_cmd' do
-      opts = {}
       opts_str = ' options'
       cmd = format('gem outdated%<opts>s', opts: opts_str)
       expect(rubygem_outdated_cmd(opts_str)).to eq(cmd)
     end
-
-    let(:opts) { {} }
 
     it 'test rubygme_update_handler' do
       allow($stdin).to receive(:gets).and_return('YES')
@@ -92,13 +91,11 @@ RSpec.describe 'TestRubygemFunctions' do
   end
 
   describe 'rubygem_updater' do
-    context 'case) do not get YES' do
+    context 'when) do not get YES' do
       let(:opts) { {} }
+
       example 'test rubygem_updater when it do not get YES' do
-        # stub STDOUT & STDIN
-        expect($stdout).to receive(:puts).with('[INFO] Do you want to update all gems?')
         allow($stdin).to receive(:gets).and_return('')
-        expect($stdout).to receive(:puts).with('[SKIP] gem update...')
         $stdin = StringIO.new('')
         rubygem_updater(opts, '')
         $stdin = STDIN
@@ -110,8 +107,10 @@ RSpec.describe 'TestRubygemFunctions' do
         opts[:not_interactive] = false
       end
     end
-    context 'cace) get YES' do
+
+    context 'when) get YES' do
       let(:opts) { {} }
+
       example 'test rubygem_cleaner when it do not get YES' do
         # stub STDOUT & STDIN
         allow($stdin).to receive(:gets).and_return('YES')
@@ -123,13 +122,12 @@ RSpec.describe 'TestRubygemFunctions' do
   end
 
   describe 'rubygem_cleaner yes/no' do
-    context 'case) do not get YES' do
+    context 'when) do not get YES' do
       let(:opts) { {} }
+
       example 'test rubygem_cleaner when it do not get YES' do
         # stub STDOUT & STDIN
-        expect($stdout).to receive(:puts).with('[INFO] Do you want to clean up gems?')
         allow($stdin).to receive(:gets).and_return('')
-        expect($stdout).to receive(:puts).with('[SKIP] gem cleanup...')
         $stdin = StringIO.new('')
         rubygem_cleaner(opts)
         $stdin = STDIN
@@ -144,6 +142,7 @@ RSpec.describe 'TestRubygemFunctions' do
 
     context 'when) get YES' do
       let(:opts) { {} }
+
       example 'test rubygem_cleaner when it do not get YES' do
         # stub STDOUT & STDIN
         allow($stdin).to receive(:gets).and_return('YES')
@@ -156,6 +155,7 @@ RSpec.describe 'TestRubygemFunctions' do
 
   describe 'rubygem_opts_builder' do
     let(:opts) { {} }
+
     it 'test rubygem_opts_builder' do
       opts_str = ''
       expect(rubygem_opts_builder(opts)).to eq(opts_str)
@@ -167,21 +167,21 @@ RSpec.describe 'TestRubygemFunctions' do
       expect(rubygem_opts_builder(opts)).to eq(opts_str)
       opts[:rubygem_option] = false
     end
+  end
+
+  describe 'rubygem_opts_builder w/ proxy option' do
+    let(:opts) { { proxy: true, proxy_params: { url: 'test@example.com' } } }
 
     it 'test rubygem_opts_builder w/ proxy option' do
-      opts[:proxy] = true
-      opts[:proxy_params] = {}
-      opts[:proxy_params][:url] = 'test@example.com'
       opts_str = " --remote --http-proxy=#{opts[:proxy_params][:url]}"
       expect(rubygem_opts_builder(opts)).to eq(opts_str)
       opts[:proxy] = false
     end
   end
-end
 
-RSpec.describe 'TestMainHndler' do
   describe 'main handler' do
     let(:opts) { {} }
+
     it 'test main handler' do
       main_handler(opts)
     end

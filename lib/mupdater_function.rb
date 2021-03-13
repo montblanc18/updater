@@ -45,6 +45,7 @@ end
 def do_cmd(cmd)
   puts format('[CMD] %<command>s', command: cmd)
   system(cmd)
+  true
 end
 
 def notice(msg)
