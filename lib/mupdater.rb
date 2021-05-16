@@ -181,7 +181,7 @@ end
 ###
 # time machine
 ###
-def time_machine_listdiplay
+def time_machine_listdisplay
   print_message('tmutil listlocalsnapshots /')
   cmd = 'tmutil listlocalsnapshots /'
   do_cmd(cmd)
@@ -341,8 +341,9 @@ def main_handler(opts)
 end
 
 if __FILE__ == $PROGRAM_NAME
+
   error('This OS is not supported.') unless os_check
   opts = option_parser
-  error('main handler did not return true') if main_handler(opts)
+  error('main handler did not return true') unless main_handler(opts)
   logout_process
 end

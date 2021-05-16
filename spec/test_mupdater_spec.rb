@@ -46,7 +46,7 @@ RSpec.describe 'TestMupdaterFunctions' do
 
   describe 'test listdisplay' do
     it 'test normal case' do
-      expect(time_machine_listdiplay).to eq(true)
+      expect(time_machine_listdisplay).to eq(true)
     end
   end
 

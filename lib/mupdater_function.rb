@@ -7,6 +7,7 @@
 require 'rbconfig'
 require 'optparse'
 require 'open3'
+require 'logger'
 
 ##########################
 ## function
@@ -15,6 +16,12 @@ require 'open3'
 Signal.trap(:INT) do
   puts 'SIGINT'
   exit(0)
+end
+
+$log = Logger.new($stdout)
+$log.progname = 'mupdater'
+$log.formatter = proc do |severity, datetime, progname, msg|
+  %({"severity": "#{severity}", "datetime": "#{datetime}", "progname": "#{progname}", "message": "#{msg}"}\n)
 end
 
 def logout_process
@@ -58,6 +65,7 @@ end
 
 def error(msg)
   puts format('[ERR] %<message>s', message: msg)
+  $log.error(msg)
 end
 
 def print_message(msg)
