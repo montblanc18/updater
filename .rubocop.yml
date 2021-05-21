@@ -5,4 +5,7 @@ AllCops:
     - bin/*
     - coverage/*
 
+GlobalVars:
+  AllowedVariables: [$log]
+
 require: rubocop-rspec
