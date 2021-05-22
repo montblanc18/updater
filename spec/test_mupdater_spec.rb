@@ -137,10 +137,9 @@ RSpec.describe 'TestMupdaterFunctions' do
     end
 
     context 'when) get YES' do
-      let(:opts) { {} }
-
       example 'test rubygem_cleaner when it do not get YES' do
         # stub STDOUT & STDIN
+        opts = {}
         allow($stdin).to receive(:gets).and_return('YES')
         $stdin = StringIO.new('')
         rubygem_cleaner(opts)

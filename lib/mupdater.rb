@@ -283,7 +283,7 @@ def rubygem_cleaner(opts)
   true
 end
 
-def rubygem_clean_handler(_opts)
+def rubygem_clean_handler(opts)
   opts_str = ''
   opts_str += ' --dryrun'
   print_message('gem cleanup --dryrun')
